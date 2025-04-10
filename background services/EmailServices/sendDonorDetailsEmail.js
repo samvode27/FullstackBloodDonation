@@ -11,7 +11,7 @@ const sendDonorDetailsEmail = async () => {
 
    if (donors.length > 0) {
       for (let donor of donors) {
-         ejs.renderFile("templates/BloodDonationDonor",
+         ejs.renderFile("templates/BloodDonationDonor.ejs",
             {
                name: donor.name,
                email: donor.email,
