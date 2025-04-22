@@ -22,7 +22,7 @@ const Menu = () => {
   }
 
   return (
-    <div className='bg-gray-100 p-[20px] w-[350px] h-[100vh] shadow'>
+    <div className='bg-gray-100 p-[20px] w-[280px] h-[110vh] shadow'>
 
       <ul className='flex flex-col items-start justify-start mt-[20px] pl-[20px]'>
         <Link to="/admin" onClick={() => handleActiveLink("/admin")}>
@@ -30,7 +30,7 @@ const Menu = () => {
               ${activeLink === "/admin" ? "bg-red-300 p-[10px] w-[200px] text-white" : ""}
             `}>
             <FaHome className={`mr-[15px] text-red-500
-              ${setActiveLink === "/admin" ? "text-white" : ""}
+              ${setActiveLink === "/admin" ? "text-white" : "text-red-500"}
             `} /> 
             Home
           </li>

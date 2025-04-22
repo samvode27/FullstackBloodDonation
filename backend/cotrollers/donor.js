@@ -17,10 +17,12 @@ const getAllDonor = async(req, res) => {
       const donors = await Donor.find().sort({createdAt: -1})
       res.status(200).json(donors)                                                                                                 
    } catch (error) {
+      console.error(error);
       res.status(500).json(error)                                                                                                 
    }                                                                                                     
 }
 
+   
 //Update Donor
 const updateDonor = async (req, res) => {
    try {
