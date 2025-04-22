@@ -4,16 +4,16 @@ const { verifyTokenAndAuthorization } = require("../middlewares/verifyToken");
 const router = express.Router();
 
 //add donor
-router.post('/login',verifyTokenAndAuthorization, createDonor)
+router.post('/',verifyTokenAndAuthorization, createDonor)
 
 //get all donor
-router.get('/login', getAllDonor)
+router.get('/', getAllDonor)
 
 //update
 router.put('/:id', updateDonor)
 
 //get one donor
-router.get('/:id', getOneDonor)
+router.get('/find/:id', getOneDonor)
 
 //delete donor
 router.delete('/:id', deleteDonor)

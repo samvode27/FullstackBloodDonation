@@ -5,6 +5,9 @@ import Admin from './pages/Admin';
 import Donors from './pages/Donors';
 import Prospects from './pages/Prospects';
 import Menu from './componenets/Menu';
+import Prospect from './pages/Prospect';
+import Newdonor from './pages/Newdonor';
+import Donor from './pages/Donor';
 
 function App() {
 
@@ -43,6 +46,18 @@ function App() {
           {
             path: '/admin/prospects',
             element: <Prospects />
+          },
+          {
+            path: '/admin/prospect/:id',
+            element: <Prospect />
+          },
+          {
+            path: '/admin/newdonor',
+            element: <Newdonor />
+          },
+          {
+            path: '/admin/donor/:id',
+            element: <Donor />
           },
         ]
       },

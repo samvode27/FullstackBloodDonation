@@ -1,7 +1,7 @@
-const mongoose = require("mongoose")
+const mongoose = require("mongoose");
 
 const prospectSchema = mongoose.Schema({
-   name: { type: String, required: true },  
+   name: { type: String, required: true }, 
    email: { type: String, required: true }, 
    address: { type: String }, 
    tel: { type: String }, 
@@ -13,7 +13,7 @@ const prospectSchema = mongoose.Schema({
    bloodpresure: { type: Number }, 
    status: { type: Number, default: 0 },                                                                                                 
 }, {
-   timestamp: true                                                                                                    
+   timestamps: true                                                                                                    
 })
 
-mongoose.exports = mongoose.model("Prospect", prospectSchema)
+module.exports = mongoose.model("Prospect", prospectSchema)
