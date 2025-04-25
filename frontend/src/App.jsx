@@ -1,4 +1,4 @@
-import {Outlet, RouterProvider, createBrowserRouter} from 'react-router-dom'
+import {Navigate, Outlet, RouterProvider, createBrowserRouter} from 'react-router-dom'
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Admin from './pages/Admin';
@@ -8,8 +8,10 @@ import Menu from './componenets/Menu';
 import Prospect from './pages/Prospect';
 import Newdonor from './pages/Newdonor';
 import Donor from './pages/Donor';
+import { useSelector } from 'react-redux'
 
 function App() {
+    const user = useSelector((state) => state.user)
 
     const Layout = () => {
       return(
@@ -33,7 +35,7 @@ function App() {
       },
       {
         path: '/admin',  
-        element: <Layout />, 
+        element: user.currentUser ? <Layout /> : <Navigate to="/login" />, 
         children: [
           {
             path: '/admin',

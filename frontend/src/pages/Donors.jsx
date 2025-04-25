@@ -13,7 +13,7 @@ const Donors = () => {
     { field: "name", headerName: "Name", width: 150 },
     { field: "address", headerName: "Address", width: 100 },
     { field: "bloodgroup", headerName: "BloodType", width: 100 },
-    { field: "diseases", headerName: "Disease", width: 100 },
+    { field: "disease", headerName: "Disease", width: 100 },
     {
       field: "edit",
       headerName: "Edit",

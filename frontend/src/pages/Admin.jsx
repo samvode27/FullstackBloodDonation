@@ -1,10 +1,44 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Gauge } from '@mui/x-charts/Gauge';
 import { LineChart } from "@mui/x-charts/LineChart"
 import { FaUser } from 'react-icons/fa';
 import { PieChart } from '@mui/x-charts/PieChart';
+import { publicRequest } from '../requestMethods';
+import { logout } from '../redux/userRedux';
+import { useNavigate } from "react-router-dom"
+import { useDispatch } from 'react-redux'
 
 const Admin = () => {
+
+  const [bloodGroupData, setBloodGropuData] = useState([])
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    const getBloodGroupStats = async() => {
+      try {
+        const res =await publicRequest.get("/donors/stats")
+        const transformedData = res.data.map((item, index) => ({
+          id: index,
+          value: item.count,
+          label: `Blood Group ${item._id}`
+        }))
+
+        setBloodGropuData(transformedData)
+
+      } catch (error) {
+        console.log(error)
+      }
+    }
+
+    getBloodGroupStats()
+  }, [])
+
+  const handleLogout = () => {
+    dispatch(logout())
+    navigate("/login")
+  }
+
   return (
     <div className='flex justify-between h-[110vh]'>
       <div className='flex flex-col'>
@@ -53,7 +87,7 @@ const Admin = () => {
       <div className='flex flex-col bg-gray-100 h-[110vh] w-[300px] shadow-xl'>
         <div className='flex item-center m-[20px] cursor-pointer'>
           <FaUser />
-          <span className='ml-[10px] font-semibold'>Logout</span>
+          <span className='ml-[10px] font-semibold' onClick={handleLogout}>Logout</span>
         </div>
 
         <div className='flex flex-col items-center justify-center m-[40px]'>
@@ -69,12 +103,7 @@ const Admin = () => {
         <PieChart
           series={[
             {
-              data: [
-                {id: 0, value: 10, label: "Blood Group A"},
-                {id: 1, value: 15, label: "Blood Group 0+"},
-                {id: 2, value: 20, label: "Blood Group Ab"},
-                {id: 3, value: 30, label: "Blood Group O-"},
-              ],
+              data: bloodGroupData,
               innerRadius: 50,
               outerRadius: 70,
               paddingAngle: 5,
