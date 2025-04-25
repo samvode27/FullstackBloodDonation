@@ -3,8 +3,8 @@ const Prospect = require('../Models/Prospect')
 //Create Prospect
 const createProspect = async(req, res) => {
    try {
-      const newDonor = Prospect(req.body);
-      const prospect = newDonor.save();
+      const newProspect = Prospect(req.body);
+      const prospect = await newProspect.save();
       res.status(201).json(prospect);                                                                                                 
    } catch (error) {
       res.status(500).json(error);                                                                                                                                                                                      
@@ -25,7 +25,7 @@ const getAllProspects = async(req, res) => {
 const updateProspect = async (req, res) => {
    try {
       const updateProspect = await Prospect.findByIdAndUpdate(
-         req.param.id,
+         req.params.id,
          { $set: req.body },
          { new: true }                                                                                              
       )    
@@ -49,7 +49,7 @@ const getOneProspect = async(req, res) => {
 const deleteProspect = async (req, res) => {
    try {
       await Prospect.findByIdAndDelete(req.params.id); 
-      res.status(200).json("Donor deleted Successfully");                                                                                                 
+      res.status(201).json("Donor deleted Successfully");                                                                                                 
    } catch (error) {
       res.status(500).json(error)                                                                                                   
    }                                                                                                    

@@ -3,7 +3,7 @@ const { createProspect, getAllProspects, updateProspect, getOneProspect, deleteP
 const router = express.Router();
 
 //add prospect
-router.post('/login', createProspect)
+router.post('/', createProspect)
 
 //get all prospect
 router.get('/', getAllProspects)

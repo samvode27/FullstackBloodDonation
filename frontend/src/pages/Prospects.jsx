@@ -10,9 +10,11 @@ const Prospects = () => {
   const columns = [
     { field: "_id", headerName: "ID", width: 70 },
     { field: "name", headerName: "Name", width: 130 },
+    { field: "email", headerName: "Email", width: 130 },
     { field: "address", headerName: "Address", width: 130 },
     { field: "bloodgroup", headerName: "BloodType", width: 110 },
-    { field: "diseases", headerName: "Disease", width: 130 },
+    { field: "disease", headerName: "Disease", width: 130 },
+    { field: "weight" , headerName: "Weight", width: 130 },
 
     {
       field: "edit",

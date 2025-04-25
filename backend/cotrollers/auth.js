@@ -1,6 +1,6 @@
 const CryptoJs = require("crypto-js");
 const jwt = require("jsonwebtoken");
-const User = require("../models/User");
+const User = require("../Models/User");
 const dotenv = require("dotenv");
 dotenv.config();
 
@@ -27,6 +27,7 @@ const registerUser = async (req, res) => {
 //LOGIN USER
 
 const loginUser = async (req, res) => {
+    console.log(req.body.email);
   try {
     const user = await User.findOne({email: req.body.email });
     if (!user) {
