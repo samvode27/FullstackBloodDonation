@@ -1,30 +1,54 @@
-import React from 'react'
+import React from 'react';
+import './CompCss.css';
 
 const Featured = () => {
   return (
-    <div className='flex px-[200px] mt-[100px]'>
+    <section id="about" className="container-fluid about-us py-5">
+      <div className="container">
+        
+        {/* Section Title */}
+        <div className="row session-title text-center mb-5">
+          <h2 style={{ color: "black", fontSize: "2.5rem", fontWeight: "bold" }}>About Us</h2>
+          <p style={{ fontSize: "1.1rem", color: "#555" }}>
+            Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has
+          </p>
+        </div>
 
-      <div className='bg-gray-200 h-[400px] w-[500px] z-10 mt-[20px]'>
-        <div className='m-10'>
-          <h1 className='text-[25px] font-semibold'>Who we are.</h1> 
-          <hr  className='bg-red-500 w-[150px] h-[3px] my-[20px]'/>
-          <span>BloodBridge is for public donation center with blood donation members in the changing health care system</span>
-          <ul>
-            <li className='mt-3'>1. Specialist blood donors and clinical supervision.</li>
-            <li className='mt-3'>2. Increasing communication with our member.</li>
-            <li className='mt-3'>3. High quality assessment, dignostics and threatment.</li>
-            <li className='mt-3'>4. Examine critically to ensure alignment.</li>
-            <li className='mt-3'>5. The extra care of a multi-disciplinary team.</li>
-          </ul>
+        {/* Content Row */}
+        <div className="row align-items-center">
+          
+          {/* Text Content */}
+          <div className="col-md-6 mb-4 mb-md-0">
+            <h2 className="font-bold mb-4" style={{ color: "black", fontSize: "2rem", fontWeight: "bold" }}>
+              About Blood Donors
+            </h2>
+
+            <h6 style={{ fontSize: "1.05rem", color: "#444", lineHeight: "1.8" }}>
+              Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting.
+            </h6>
+
+            <h6 style={{ fontSize: "1.05rem", color: "#444", lineHeight: "1.8" }}>
+              It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker.
+            </h6>
+
+            <h6 style={{ fontSize: "1.05rem", color: "#444", lineHeight: "1.8" }}>
+              There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, humour, or randomised words which don't look even slightly believable.
+            </h6>
+
+            <h6 style={{ fontSize: "1.05rem", color: "#444", lineHeight: "1.8" }}>
+              The industry's standard dummy text has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.
+            </h6>
+          </div>
+
+          {/* Image Content */}
+          <div className="col-md-6">
+            <img src="/about.jpg" alt="About Blood Donation" className="img-fluid rounded" />
+          </div>
 
         </div>
       </div>
-      <div className='h-[450px w-[500px] ml-[-30px]'> 
-        <video src='/video.mp4' height="450px" width="500px" loop muted autoPlay></video>
-      </div>
-                                                                                                       
-    </div>
-  )
-}
+    </section>
+  );
+};
 
-export default Featured
+export default Featured;

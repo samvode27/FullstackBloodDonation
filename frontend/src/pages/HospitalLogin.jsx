@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
-import { Navigate } from "react-router-dom"
+import { Link, Navigate } from "react-router-dom"
 import { useDispatch, useSelector } from 'react-redux'
 import { login } from "../redux/apiCalls"
 
-const Login = () => {
+const HospitalLogin = () => {
 
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
@@ -35,7 +35,7 @@ const Login = () => {
         </div>
 
         <div className='p-10 w-[500px]'>
-          <h2 className='text-2xl font-bold text-gray-600 mb-5'>Login</h2>
+          <h2 className='text-2xl font-bold text-gray-600 mb-5'>Hospital Login</h2>
 
           <form className='space-y-5'>
             <div>
@@ -52,6 +52,17 @@ const Login = () => {
               {loading ? "loading..." : "Login"}
               {user.currentUser ? <Navigate to="/admin" /> : ""}
             </button>
+
+            <div>
+              <a href="#" className="hover:text-gray-600 font-semibold w-6 h-6 ml-5 text-lg">
+                Forgot your Password?
+              </a>
+              <a href="#" className="hover:text-gray-600 font-semibold w-6 h-6 ml-5 text-lg">
+                <Link to="/hospitalregister">
+                  Create an Account
+                </Link>
+              </a>
+            </div>
           </form>
         </div>
 
@@ -60,4 +71,4 @@ const Login = () => {
   )
 }
 
-export default Login
+export default HospitalLogin
