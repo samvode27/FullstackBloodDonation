@@ -1,20 +1,96 @@
-import React from 'react'
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const Hero = () => {
+  const navigate = useNavigate();
+
+  const DonorLogin = () => {
+    navigate("/donorlogin");
+  };
+
   return (
-    <div className='bg-[url("/hero1.jpg")] bg-n0-repeat bg-center h-[85vh] px-[200px]'>
-
-      <div className='flex flex-col text-white w-[50%] pt-[10%]'>
-        <span className='text-[30px] mt-3' >Donate blood, Save life!</span>
-        <h1 className='text-[38px] mt-3'>Your Blood Can Bring Smile In Other Personal Life.</h1>
-        <div className='flex items-center mt-[20px]'>
-          <button className='bg-red-500 p-[10px] w-[200px] text-white cursor-pointer mr-9'>Donate Now</button>
-          <button className='bg-gray-500 p-[10px] w-[200px] text-white cursor-pointer mr-9'>CALL: (+251) 923 233</button>
+    <div className="slider-detail">
+      <div id="carouselExampleIndicators" className="carousel slide" data-bs-ride="carousel" data-bs-interval="2000">
+        
+        {/* Carousel Indicators */}
+        <div className="carousel-indicators">
+          <button
+            type="button"
+            data-bs-target="#carouselExampleIndicators"
+            data-bs-slide-to="0"
+            className="active"
+            aria-current="true"
+            aria-label="Slide 1"
+          ></button>
+          <button
+            type="button"
+            data-bs-target="#carouselExampleIndicators"
+            data-bs-slide-to="1"
+            aria-label="Slide 2"
+          ></button>
         </div>
+
+        {/* Carousel Inner */}
+        <div className="carousel-inner">
+          {/* First Slide */}
+          <div className="carousel-item active">
+            <img className="d-block w-100" src="/slide-02.jpg" alt="First slide" />
+            <div className="carousel-caption d-none d-md-block">
+              <h5 className="bounceInDown">Donate Blood & Save a Life</h5>
+              <p className="bounceInLeft">
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam justo neque, <br />
+                aliquet sit amet elementum vel, vehicula eget eros. Vivamus arcu metus, <br />
+                mattis sed sagittis at, sagittis quis neque. Praesent.
+              </p>
+              <div className="vbh">
+                <button className="btn btn-success bounceInUp me-2" onClick={DonorLogin}>
+                  Donate Now
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Second Slide */}
+          <div className="carousel-item">
+            <img className="d-block w-100" src="/slide-03.jpg" alt="Second slide" />
+            <div className="carousel-caption d-none d-md-block">
+              <h5 className="bounceInDown">Donate Blood & Save a Life</h5>
+              <p className="bounceInLeft">
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam justo neque, <br />
+                aliquet sit amet elementum vel, vehicula eget eros. Vivamus arcu metus, <br />
+                mattis sed sagittis at, sagittis quis neque. Praesent.
+              </p>
+              <div className="vbh">
+                <button onClick={DonorLogin} className="btn btn-danger bounceInUp me-2">
+                  Donate Now
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Carousel Controls */}
+        <button
+          className="carousel-control-prev"
+          type="button"
+          data-bs-target="#carouselExampleIndicators"
+          data-bs-slide="prev"
+        >
+          <span className="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span className="visually-hidden">Previous</span>
+        </button>
+        <button
+          className="carousel-control-next"
+          type="button"
+          data-bs-target="#carouselExampleIndicators"
+          data-bs-slide="next"
+        >
+          <span className="carousel-control-next-icon" aria-hidden="true"></span>
+          <span className="visually-hidden">Next</span>
+        </button>
       </div>
-
     </div>
-  )
-}
+  );
+};
 
-export default Hero
+export default Hero;

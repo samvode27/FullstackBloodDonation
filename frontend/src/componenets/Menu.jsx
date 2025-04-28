@@ -65,10 +65,16 @@ const Menu = () => {
           </li>
         </Link>
 
-        <li className='flex items-center text-[20px] cursor-pointer font-semibold mt-[20px] transition-colors duration-100'>
-          <FaHome className='mr-[15px] text-red-500 ' /> 
-          Orders
-        </li>
+        <Link to="/admin/hospitals" onClick={() => handleActiveLink("/admin/hospitals")}>
+          <li className={`flex items-center text-[20px] cursor-pointer font-semibold mt-[20px] transition-colors duration-100
+              ${activeLink === "/admin/hospitals" ? "bg-red-300 p-[10px] w-[200px] text-white" : ""}
+            `}>
+            <FaUsers className={`mr-[15px] text-red-500
+              ${setActiveLink === "/admin/hospitals" ? "text-white" : ""}
+            `} /> 
+            Hospitals
+          </li>
+        </Link>
 
         <hr className='w-full my-[20px] border-gray-300' />
 
