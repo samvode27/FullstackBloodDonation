@@ -1,60 +1,120 @@
-import React, { useState } from 'react'
-import { publicRequest } from '../requestMethods'
+import React, { useState } from 'react';
+import { publicRequest } from '../requestMethods';
 import { ToastContainer, toast } from 'react-toastify';
-import "react-toastify/dist/ReactToastify.css";
+import 'react-toastify/dist/ReactToastify.css';
 import { Link } from 'react-router-dom';
 
 const HospitalRegister = () => {
-
-  const [inputs, setInputs] = useState({})
+  const [inputs, setInputs] = useState({});
 
   const handleChange = (e) => {
-    setInputs((prev) => {
-      return { ...prev, [e.target.name]: e.target.value }
-    })
-  }
+    const { name, value } = e.target;
+    setInputs((prev) => ({ ...prev, [name]: value }));
+  };
 
-  const handleProspects = async () => {
+  const handleProspects = async (e) => {
+    e.preventDefault();
     try {
-      await publicRequest.post("/donors", inputs)
-      toast.success("Donor has been seccesfully created to the data base")
-      setInputs({})
+      await publicRequest.post("/donors", inputs);
+      toast.success("Hospital registered successfully.");
+      setInputs({});
     } catch (error) {
-      toast.warning(error.message)
+      toast.error("Failed to register: " + error.message);
     }
-  }
+  };
 
   return (
-    <div className='flex items-center justify-center my-[50px]'>
-      <div className='flex flex-col bg-gray-100 w-[500px] h-auto p-[50px]'>
-        <div className='text-[20px] my-1'>
-          <h2>Do you want to get blood? First create account.</h2>
+    <>
+      <ToastContainer position="top-center" />
+      
+      <nav className="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
+        <div className="container">
+          <a className="navbar-brand" href="/">
+            <img
+              src="/Logo.jpg"
+              alt="Logo"
+              height="50"
+              width="220"
+              className="d-inline-block align-text-top"
+            />
+          </a>
         </div>
+      </nav>
 
-        <label className='text=[18px] mt-[10px] font-semibold'>Hospital Name</label>
-        <input className='w-full p-3 mt-1' type="text" placeholder='John Doe' name='name' value={inputs.name || ""} onChange={handleChange} />
+      <main className="container d-flex justify-content-center align-items-center min-vh-100" style={{ paddingTop: '100px' }}>
+        <div className="card shadow p-4 w-100" style={{ maxWidth: '500px' }}>
+          <h2 className="text-center mb-4">Hospital Registration</h2>
 
-        <label className='text=[18px] mt-[10px] font-semibold'>Hospital Email</label>
-        <input className='w-full p-3 mt-1' type="email" placeholder='Johndoe@gmail.com' name='email' value={inputs.email || ""} onChange={handleChange} required />
+          <form onSubmit={handleProspects} noValidate>
+            <div className="mb-3">
+              <label htmlFor="name" className="form-label">Hospital Name</label>
+              <input
+                type="text"
+                className="form-control"
+                id="name"
+                name="name"
+                placeholder="Example Hospital"
+                value={inputs.name || ""}
+                onChange={handleChange}
+                required
+              />
+            </div>
 
-        <label className='text=[18px] mt-[10px] font-semibold'>Hospital Address</label>
-        <input className='w-full p-3 mt-1' type="text" placeholder='123 Town Street' name='address' value={inputs.address || ""} onChange={handleChange} />
+            <div className="mb-3">
+              <label htmlFor="email" className="form-label">Hospital Email</label>
+              <input
+                type="email"
+                className="form-control"
+                id="email"
+                name="email"
+                placeholder="hospital@example.com"
+                value={inputs.email || ""}
+                onChange={handleChange}
+                required
+              />
+            </div>
 
-        <label className='text=[18px] mt-[10px] font-semibold'>Hospital Telephone Number</label>
-        <input className='w-full p-3 mt-1' type="text" placeholder='12345678' name='tel' value={inputs.tel || ""} onChange={handleChange} />
+            <div className="mb-3">
+              <label htmlFor="address" className="form-label">Address</label>
+              <input
+                type="text"
+                className="form-control"
+                id="address"
+                name="address"
+                placeholder="123 Main St"
+                value={inputs.address || ""}
+                onChange={handleChange}
+              />
+            </div>
 
-        <button className='bg-red-500 p-3 mt-3 w-full cursor-pointer text-white font-bold transition-transform duration-700 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 transform hover:scale-105' onClick={handleProspects}>Submit</button>
-     
-        <a href="#" className="hover:text-gray-600 font-semibold text-lg w-full mt-3 ml-[25%]">
-          <Link to="/login">
-            Already have an Account
-          </Link>
-        </a>
-  
+            <div className="mb-4">
+              <label htmlFor="tel" className="form-label">Telephone Number</label>
+              <input
+                type="tel"
+                className="form-control"
+                id="tel"
+                name="tel"
+                placeholder="0123456789"
+                value={inputs.tel || ""}
+                onChange={handleChange}
+              />
+            </div>
 
-      </div>
-    </div>
-  )
-}
+            <button type="submit" className="btn btn-danger w-100 mb-3">
+              Register
+            </button>
 
-export default HospitalRegister
+            <div className="text-center">
+              <span>Already have an account? </span>
+              <Link to="/login" className="fw-semibold text-decoration-none">
+                Log In
+              </Link>
+            </div>
+          </form>
+        </div>
+      </main>
+    </>
+  );
+};
+
+export default HospitalRegister;

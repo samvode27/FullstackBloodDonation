@@ -1,31 +1,25 @@
 import React, { useEffect, useState } from 'react'
-import { Gauge } from '@mui/x-charts/Gauge';
-import { LineChart } from "@mui/x-charts/LineChart"
 import { FaUser } from 'react-icons/fa';
-import { PieChart } from '@mui/x-charts/PieChart';
 import { publicRequest } from '../requestMethods';
 import { logout } from '../redux/userRedux';
 import { useNavigate } from "react-router-dom"
 import { useDispatch } from 'react-redux'
 
 const Admin = () => {
-
-  const [bloodGroupData, setBloodGropuData] = useState([])
+  const [bloodGroupData, setBloodGroupData] = useState([])
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
   useEffect(() => {
-    const getBloodGroupStats = async() => {
+    const getBloodGroupStats = async () => {
       try {
-        const res =await publicRequest.get("/donors/stats")
+        const res = await publicRequest.get("/donors/stats")
         const transformedData = res.data.map((item, index) => ({
           id: index,
           value: item.count,
           label: `Blood Group ${item._id}`
         }))
-
-        setBloodGropuData(transformedData)
-
+        setBloodGroupData(transformedData)
       } catch (error) {
         console.log(error)
       }
@@ -40,82 +34,30 @@ const Admin = () => {
   }
 
   return (
-    <div className='flex justify-between h-[110vh]'>
-      <div className='flex flex-col'>
-
-        <div className='flex flex-wrap'>
-          <div className='bg-gray-50 m-[30px] h-[300px] w-[320px] shadow-xl'>
-            <div className='w-[200px] h-[200px]'>
-              <Gauge
-                value={75}
-                startAngle={0}
-                endAngle={360}
-                innerRadius="80%"
-                outerRadius="100%"
-              // ...
-              />
-            </div>
-            <h2 className='font-semibold text-[18px] m-[40px]'>Prospects</h2>
-          </div>
-
-          <div className='bg-gray-50 m-[30px] h-[300px] w-[320px] shadow-xl'>
-            <div className='w-[200px] h-[200px] m-[30px] border-[20px] border-red-400 border-solid rounded-full'>
-              <div className='flex items-center justify-center m-[30px]'>
-                <h2 className='font-semibold text-[18px] m-[40px]'>100</h2>
-              </div>
-
-              <h2 className='font-semibold text-[18px] m-[40px]'>Donors</h2>
-            </div>       
-          </div>
-          
-        </div>
-
-        <div>
-          <LineChart
-            xAxis={[{ data: [1, 2, 3, 5, 8, 10] }]}
-            series={[
-              {
-                data: [2, 5.5, 2, 8.5, 1.5, 5],
-              },
-            ]}
-            margin={{ left: 30, right: 30, top: 30, bottom: 30 }}
-            height={300}
-            grid={{ vertical: true, horizontal: true, }}
-          />
-        </div>
+    <div className="d-flex flex-column bg-light shadow" style={{ width: '100vw', height: '100vh' }}>
+      
+      <div className="d-flex align-items-center p-3 border-bottom">
+        <FaUser />
+        <span className="ms-2 fw-semibold cursor-pointer" onClick={handleLogout}>Logout</span>
       </div>
 
-      <div className='flex flex-col bg-gray-100 h-[110vh] w-[300px] shadow-xl'>
-        <div className='flex item-center m-[20px] cursor-pointer'>
-          <FaUser />
-          <span className='ml-[10px] font-semibold' onClick={handleLogout}>Logout</span>
-        </div>
+      <div className="px-3 flex-grow-1 overflow-auto">
+        <h5 className="fw-bold text-center mb-3">Blood Group Stats</h5>
+        <div className="row">
+          {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map((type, index) => {
+            const found = bloodGroupData.find((b) => b.label.includes(type));
+            const value = found ? found.value : 0;
 
-        <div className='flex flex-col items-center justify-center m-[40px]'>
-          <h2 className='font-bold'>Recent Donors</h2>
-          <ul>
-            <li>1. James Losly</li>
-            <li>2. Samuel Setarige</li>
-            <li>3. Samuel Setarige</li>
-            <li>4. Samuel Setarige</li>
-          </ul>
+            return (
+              <div key={index} className="col-6 col-md-3 mb-4">
+                <div className="bg-white border rounded shadow-sm p-3 text-center h-100">
+                  <div className="fw-semibold">Blood Group {type}</div>
+                  <div className="text-danger fw-bold fs-5">{value}</div>
+                </div>
+              </div>
+            );
+          })}
         </div>
-
-        <PieChart
-          series={[
-            {
-              data: bloodGroupData,
-              innerRadius: 50,
-              outerRadius: 70,
-              paddingAngle: 5,
-              cornerRadius: 5,
-              startAngle: -45,
-              endAngle: 225,
-              cx: 150,
-              cy: 110,
-            }
-          ]}
-        />
       </div>
     </div>
   )

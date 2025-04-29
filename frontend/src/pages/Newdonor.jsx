@@ -18,7 +18,7 @@ const Newdonor = () => {
   const handleDonors = async () => {
     try {
       await publicRequest.post("/donors", inputs, {
-        headers: {token: `Bearer ${user.currentUser.accessToken}`}
+        Authorization: {token: `Bearer ${user.currentUser.accessToken}`}
       })
       toast.success("Donor has been seccesfully created to the data base")
       setInputs({})

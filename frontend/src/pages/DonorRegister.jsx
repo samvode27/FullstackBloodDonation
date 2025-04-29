@@ -1,83 +1,183 @@
-import React, { useState } from 'react'
-import { publicRequest } from '../requestMethods'
+import React, { useState } from 'react';
+import { publicRequest } from '../requestMethods';
 import { ToastContainer, toast } from 'react-toastify';
-import "react-toastify/dist/ReactToastify.css";
+import 'react-toastify/dist/ReactToastify.css';
 import { Link } from 'react-router-dom';
 
 const DonorRegister = () => {
-
-  const [inputs, setInputs] = useState({})
+  const [inputs, setInputs] = useState({});
 
   const handleChange = (e) => {
-    setInputs((prev) => {
-      return { ...prev, [e.target.name]: e.target.value }
-    })
-  }
+    const { name, value } = e.target;
+    setInputs((prev) => ({ ...prev, [name]: value }));
+  };
 
-  const handleProspects = async () => {
+  const handleProspects = async (e) => {
+    e.preventDefault();
     try {
-      await publicRequest.post("/donors", inputs)
-      toast.success("Donor has been seccesfully created to the data base")
-      setInputs({})
+      await publicRequest.post("/donors", inputs);
+      toast.success("Donor registered successfully.");
+      setInputs({});
     } catch (error) {
-      toast.warning(error.message)
+      toast.error("Registration failed: " + error.message);
     }
-  }
+  };
 
   return (
-    <div className='flex items-center justify-center my-[50px]'>
-      <div className='flex flex-col bg-gray-100 w-[500px] h-auto p-[50px]'>
-        <div className='text-[20px] my-1'>
-          <h2>Do you want to donate blood? Fill in the information.</h2>
-        </div>
+    <>
+      <ToastContainer position="top-center" />
 
-        <label className='text=[18px] mt-[10px] font-semibold'>Name</label>
-        <input className='w-full p-3 mt-1' type="text" placeholder='John Doe' name='name' value={inputs.name || ""} onChange={handleChange} />
-
-        <label className='text=[18px] mt-[10px] font-semibold'>Email</label>
-        <input className='w-full p-3 mt-1' type="email" placeholder='Johndoe@gmail.com' name='email' value={inputs.email || ""} onChange={handleChange} required />
-
-        <label className='text=[18px] mt-[10px] font-semibold'>Address</label>
-        <input className='w-full p-3 mt-1' type="text" placeholder='123 Town Street' name='address' value={inputs.address || ""} onChange={handleChange} />
-
-        <label className='text=[18px] mt-[10px] font-semibold'>Telephone</label>
-        <input className='w-full p-3 mt-1' type="text" placeholder='12345678' name='tel' value={inputs.tel || ""} onChange={handleChange} />
-
-        <label className='text=[18px] mt-[10px] font-semibold'>Blood Group</label>
-        <select className='w-full p-3 mt-1' name='bloodgroup' value={inputs.bloodgroup || ""} onChange={handleChange}>
-          <option value="">Select Blood Group</option>
-          <option value="A+">A+</option>
-          <option value="A-">A-</option>
-          <option value="B+">B+</option>
-          <option value="B-">B-</option>
-          <option value="AB+">AB+</option>
-          <option value="AB-">AB-</option>
-          <option value="O+">O+</option>
-          <option value="O-">O-</option>
-        </select>
-
-        <label className='text=[18px] mt-[10px] font-semibold'>Weight</label>
-        <input className='w-full p-3 mt-1' type="Number" placeholder='50kg' name='weight' value={inputs.weight || ""} onChange={handleChange} />
-
-        <label className='text=[18px] mt-[10px] font-semibold'>Age</label>
-        <input className='w-full p-3 mt-1' type="Number" placeholder='20' name='age' value={inputs.age || ""} onChange={handleChange} />
-
-        <label className='text=[18px] mt-[10px] font-semibold'>Do you have any diseases?</label>
-        <textarea className='w-full p-3 mt-1' type="Number" placeholder='N/A' name='disease' value={inputs.disease || ""} onChange={handleChange} />
-
-        <button className='bg-red-500 p-3 mt-3 w-full cursor-pointer text-white font-bold transition-transform duration-700 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 transform hover:scale-105' onClick={handleProspects}>Submit</button>
-
-     
-          <a href="#" className="hover:text-gray-600 font-semibold text-lg w-full mt-3 ml-[25%]">
-            <Link to="/login">
-              Already have an Account
-            </Link>
+      <nav className="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
+        <div className="container">
+          <a className="navbar-brand" href="/">
+            <img
+              src="/Logo.jpg"
+              alt="Logo"
+              height="50"
+              width="220"
+              className="d-inline-block align-text-top"
+            />
           </a>
-  
+        </div>
+      </nav>
 
-      </div>
-    </div>
-  )
-}
+      <main className="container d-flex justify-content-center align-items-center min-vh-100" style={{ paddingTop: '100px' }}>
+        <div className="card shadow-sm p-4 w-100" style={{ maxWidth: '600px' }}>
+          <h2 className="text-center mb-4">Donor Registration</h2>
 
-export default DonorRegister
+          <form onSubmit={handleProspects} noValidate>
+            <div className="mb-3">
+              <label htmlFor="name" className="form-label">Full Name</label>
+              <input
+                type="text"
+                className="form-control"
+                id="name"
+                name="name"
+                placeholder="John Doe"
+                value={inputs.name || ""}
+                onChange={handleChange}
+                required
+              />
+            </div>
+
+            <div className="mb-3">
+              <label htmlFor="email" className="form-label">Email</label>
+              <input
+                type="email"
+                className="form-control"
+                id="email"
+                name="email"
+                placeholder="johndoe@example.com"
+                value={inputs.email || ""}
+                onChange={handleChange}
+                required
+              />
+            </div>
+
+            <div className="mb-3">
+              <label htmlFor="address" className="form-label">Address</label>
+              <input
+                type="text"
+                className="form-control"
+                id="address"
+                name="address"
+                placeholder="123 Town Street"
+                value={inputs.address || ""}
+                onChange={handleChange}
+              />
+            </div>
+
+            <div className="mb-3">
+              <label htmlFor="tel" className="form-label">Telephone</label>
+              <input
+                type="tel"
+                className="form-control"
+                id="tel"
+                name="tel"
+                placeholder="0123456789"
+                value={inputs.tel || ""}
+                onChange={handleChange}
+              />
+            </div>
+
+            <div className="mb-3">
+              <label htmlFor="bloodgroup" className="form-label">Blood Group</label>
+              <select
+                className="form-select"
+                id="bloodgroup"
+                name="bloodgroup"
+                value={inputs.bloodgroup || ""}
+                onChange={handleChange}
+                required
+              >
+                <option value="">Select Blood Group</option>
+                <option value="A+">A+</option>
+                <option value="A-">A-</option>
+                <option value="B+">B+</option>
+                <option value="B-">B-</option>
+                <option value="AB+">AB+</option>
+                <option value="AB-">AB-</option>
+                <option value="O+">O+</option>
+                <option value="O-">O-</option>
+              </select>
+            </div>
+
+            <div className="row">
+              <div className="col-md-6 mb-3">
+                <label htmlFor="weight" className="form-label">Weight (kg)</label>
+                <input
+                  type="number"
+                  className="form-control"
+                  id="weight"
+                  name="weight"
+                  placeholder="e.g. 60"
+                  value={inputs.weight || ""}
+                  onChange={handleChange}
+                />
+              </div>
+
+              <div className="col-md-6 mb-3">
+                <label htmlFor="age" className="form-label">Age</label>
+                <input
+                  type="number"
+                  className="form-control"
+                  id="age"
+                  name="age"
+                  placeholder="e.g. 25"
+                  value={inputs.age || ""}
+                  onChange={handleChange}
+                />
+              </div>
+            </div>
+
+            <div className="mb-4">
+              <label htmlFor="disease" className="form-label">Do you have any diseases?</label>
+              <textarea
+                className="form-control"
+                id="disease"
+                name="disease"
+                rows="3"
+                placeholder="N/A"
+                value={inputs.disease || ""}
+                onChange={handleChange}
+              />
+            </div>
+
+            <button type="submit" className="btn btn-danger w-100 mb-3">
+              Submit
+            </button>
+
+            <div className="text-center">
+              <span>Already have an account? </span>
+              <Link to="/donorlogin" className="fw-semibold text-decoration-none">
+                Log In
+              </Link>
+            </div>
+          </form>
+        </div>
+      </main>
+    </>
+  );
+};
+
+export default DonorRegister;
