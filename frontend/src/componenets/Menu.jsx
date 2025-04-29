@@ -11,7 +11,10 @@ import {
   FaHome,
   FaUser,
   FaUsers,
+  FaTint
 } from "react-icons/fa";
+import { MdLocalHospital } from "react-icons/md";
+
 
 const Menu = () => {
 
@@ -47,7 +50,7 @@ const Menu = () => {
           <li className={`flex items-center text-[20px] cursor-pointer font-semibold mt-[20px] transition-colors duration-100
               ${activeLink === "/admin/donors" ? "bg-red-300 p-[10px] w-[200px] text-white" : ""}
             `}>
-            <FaBox className={`mr-[15px] text-red-500
+            <FaTint className={`mr-[15px] text-red-500
               ${setActiveLink === "/admin/donors" ? "text-white" : ""}
             `} /> 
             Donors
@@ -69,7 +72,7 @@ const Menu = () => {
           <li className={`flex items-center text-[20px] cursor-pointer font-semibold mt-[20px] transition-colors duration-100
               ${activeLink === "/admin/hospitals" ? "bg-red-300 p-[10px] w-[200px] text-white" : ""}
             `}>
-            <FaUsers className={`mr-[15px] text-red-500
+            <MdLocalHospital className={`mr-[15px] text-red-500
               ${setActiveLink === "/admin/hospitals" ? "text-white" : ""}
             `} /> 
             Hospitals

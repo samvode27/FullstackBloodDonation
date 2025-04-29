@@ -65,8 +65,9 @@ const Admin = () => {
               </div>
 
               <h2 className='font-semibold text-[18px] m-[40px]'>Donors</h2>
-            </div>
+            </div>       
           </div>
+          
         </div>
 
         <div>
