@@ -4,7 +4,7 @@ const { createHospital, getAllHospitals, updateHospital, getOneHospital, deleteH
 const router = express.Router();
 
 //add Hospital
-router.post('/', verifyToken, createHospital)
+router.post('/', createHospital)
 
 //get all Hospitals
 router.get('/', getAllHospitals)
