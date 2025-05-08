@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const hospitalSchema = mongoose.Schema({
    name: { type: String, required: true },
    email: { type: String, required: true }, 
+   password:{type:String, require:true},
    address: { type: String }, 
    tel: { type: String }, 
    date: { type: String }, 

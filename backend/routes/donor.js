@@ -1,7 +1,20 @@
 const express = require("express");
-const { createDonor, getAllDonor, updateDonor, getOneDonor, deleteDonor, getDonorStats } = require("../cotrollers/donor");
+const { createDonor, getAllDonor, updateDonor, getOneDonor, deleteDonor, getDonorStats, loginDonor, registerDonor, forgotPassword, resetPassword, changePassword, signin, signup, sendVerificationCode, verifyVerificationCode, sendForgotPasswordCode, verifyForgotPasswordCode } = require("../cotrollers/donor");
 const { verifyToken } = require("../middlewares/verifyToken");
 const router = express.Router();
+const { identifier } = require('../middlewares/identification')
+
+
+router.post('/signup', signup)
+router.post('/signin', signin)
+
+router.patch('/sendverificationcode', identifier, sendVerificationCode)
+router.patch('/verifyverificationcode', identifier, verifyVerificationCode)
+router.patch('/change-password', identifier, changePassword)
+
+router.patch('/send-forgot-password-code', sendForgotPasswordCode)
+router.patch('/verify-forgot-password-code', verifyForgotPasswordCode)
+
 
 //add donor
 router.post('/', createDonor)

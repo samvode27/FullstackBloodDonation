@@ -12,7 +12,7 @@ const DonorRegister = () => {
     setInputs((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleProspects = async (e) => {
+  const handleDonors = async (e) => {
     e.preventDefault();
     try {
       await publicRequest.post("/donors", inputs);
@@ -45,7 +45,7 @@ const DonorRegister = () => {
         <div className="card shadow-sm p-4 w-100" style={{ maxWidth: '600px' }}>
           <h2 className="text-center mb-4">Donor Registration</h2>
 
-          <form onSubmit={handleProspects} noValidate>
+          <form onSubmit={handleDonors} noValidate>
             <div className="mb-3">
               <label htmlFor="name" className="form-label">Full Name</label>
               <input
@@ -69,6 +69,20 @@ const DonorRegister = () => {
                 name="email"
                 placeholder="johndoe@example.com"
                 value={inputs.email || ""}
+                onChange={handleChange}
+                required
+              />
+            </div>
+
+            <div className="mb-3">
+              <label htmlFor="password" className="form-label">Password</label>
+              <input
+                type="password"
+                className="form-control"
+                id="password"
+                name="password"
+                placeholder="********"
+                value={inputs.password || ""}
                 onChange={handleChange}
                 required
               />

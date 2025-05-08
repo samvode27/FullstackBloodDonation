@@ -2,3 +2,65 @@
 @tailwind components;
 @tailwind utilities;
 
+
+.donor-card {
+  transition: all 0.3s ease;
+}
+
+.donor-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.pulse-animation {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.page-link svg {
+  height: 1em;
+  width: 1em;
+}
+
+.text-muted.hover\:text-white:hover {
+  color: white !important;
+}
+
+
+.hospital-card {
+  transition: all 0.3s ease;
+}
+
+.hospital-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.blood-badge {
+  min-width: 50px;
+  display: inline-block;
+  text-align: center;
+}
+
+
+@media (max-width: 768px) {
+  .table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+
+.badge-blood-Aplus { background-color: #dc3545; }
+.badge-blood-Aminus { background-color: #6c757d; }
+.badge-blood-Bplus { background-color: #ffc107; color: #000; }
+.badge-blood-Bminus { background-color: #0dcaf0; }
+.badge-blood-ABplus { background-color: #198754; }
+.badge-blood-ABminus { background-color: #0d6efd; }
+.badge-blood-Oplus { background-color: #212529; }
+.badge-blood-Ominus { background-color: #f8f9fa; color: #000; } 

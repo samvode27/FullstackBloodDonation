@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import {Link} from 'react-router-dom'
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import {
   FaBox,
   FaCalendarAlt,
@@ -15,107 +15,75 @@ import {
 } from "react-icons/fa";
 import { MdLocalHospital } from "react-icons/md";
 
-
 const Menu = () => {
-
-  const [activeLink, setActiveLink] = useState("/admin")
+  const [activeLink, setActiveLink] = useState("/admin");
 
   const handleActiveLink = (link) => {
-    setActiveLink(link)
-  }
+    setActiveLink(link);
+  };
+
+  const getLinkClasses = (link) => 
+    `list-group-item list-group-item-action d-flex align-items-center gap-2 ${
+      activeLink === link ? "active bg-danger text-white border-danger" : ""
+    }`;
 
   return (
-    <div className='bg-gray-100 p-[20px] w-[280px] h-[110vh] shadow'>
+    <div className="bg-light p-3" style={{ width: '280px', height: '110vh' }}>
+      <div className="list-group">
 
-      <ul className='flex flex-col items-start justify-start mt-[20px] pl-[20px]'>
-        <Link to="/admin" onClick={() => handleActiveLink("/admin")}>
-          <li className={`flex items-center text-[20px] cursor-pointer font-semibold mt-[20px] transition-colors duration-100
-              ${activeLink === "/admin" ? "bg-red-300 p-[10px] w-[200px] text-white" : ""}
-            `}>
-            <FaHome className={`mr-[15px] text-red-500
-              ${setActiveLink === "/admin" ? "text-white" : "text-red-500"}
-            `} /> 
-            Home
-          </li>
+        <Link to="/admin" onClick={() => handleActiveLink("/admin")} className={getLinkClasses("/admin")}>
+          <FaHome /> Home
         </Link>
 
-        <li className='flex items-center text-[20px] cursor-pointer font-semibold mt-[20px] transition-colors duration-100'>
-          <FaUser className='mr-[15px] text-red-500 ' /> 
-          Profile
-        </li>
+        <div className="list-group-item d-flex align-items-center gap-2">
+          <FaUser className="text-danger" /> Profile
+        </div>
 
-        <hr className='w-full my-[20px] border-gray-300' />
+        <hr />
 
-        <Link to="/admin/donors" onClick={() => handleActiveLink("/admin/donors")}>
-          <li className={`flex items-center text-[20px] cursor-pointer font-semibold mt-[20px] transition-colors duration-100
-              ${activeLink === "/admin/donors" ? "bg-red-300 p-[10px] w-[200px] text-white" : ""}
-            `}>
-            <FaTint className={`mr-[15px] text-red-500
-              ${setActiveLink === "/admin/donors" ? "text-white" : ""}
-            `} /> 
-            Donors
-          </li>
+        <Link to="/admin/donors" onClick={() => handleActiveLink("/admin/donors")} className={getLinkClasses("/admin/donors")}>
+          <FaTint /> Donors
         </Link>
 
-        <Link to="/admin/prospects" onClick={() => handleActiveLink("/admin/prospects")}>
-          <li className={`flex items-center text-[20px] cursor-pointer font-semibold mt-[20px] transition-colors duration-100
-              ${activeLink === "/admin/prospects" ? "bg-red-300 p-[10px] w-[200px] text-white" : ""}
-            `}>
-            <FaUsers className={`mr-[15px] text-red-500
-              ${setActiveLink === "/admin/prospects" ? "text-white" : ""}
-            `} /> 
-            Prospects
-          </li>
+        <Link to="/admin/prospects" onClick={() => handleActiveLink("/admin/prospects")} className={getLinkClasses("/admin/prospects")}>
+          <FaUsers /> Prospects
         </Link>
 
-        <Link to="/admin/hospitals" onClick={() => handleActiveLink("/admin/hospitals")}>
-          <li className={`flex items-center text-[20px] cursor-pointer font-semibold mt-[20px] transition-colors duration-100
-              ${activeLink === "/admin/hospitals" ? "bg-red-300 p-[10px] w-[200px] text-white" : ""}
-            `}>
-            <MdLocalHospital className={`mr-[15px] text-red-500
-              ${setActiveLink === "/admin/hospitals" ? "text-white" : ""}
-            `} /> 
-            Hospitals
-          </li>
+        <Link to="/admin/hospitals" onClick={() => handleActiveLink("/admin/hospitals")} className={getLinkClasses("/admin/hospitals")}>
+          <MdLocalHospital /> Hospitals
         </Link>
 
-        <hr className='w-full my-[20px] border-gray-300' />
+        <hr />
 
-        <li className='flex items-center text-[20px] cursor-pointer font-semibold mt-[20px] transition-colors duration-100'>
-          <FaElementor className='mr-[15px] text-red-500 ' /> 
-          Elements
-        </li>
+        <div className="list-group-item d-flex align-items-center gap-2">
+          <FaElementor className="text-danger" /> Elements
+        </div>
 
-        <li className='flex items-center text-[20px] cursor-pointer font-semibold mt-[20px] transition-colors duration-100'>
-          <FaCog className='mr-[15px] text-red-500 ' /> 
-          Settings
-        </li>
+        <div className="list-group-item d-flex align-items-center gap-2">
+          <FaCog className="text-danger" /> Settings
+        </div>
 
-        <li className='flex items-center text-[20px] cursor-pointer font-semibold mt-[20px] transition-colors duration-100'>
-          <FaHdd className='mr-[15px] text-red-500 ' /> 
-          Backups
-        </li>
+        <div className="list-group-item d-flex align-items-center gap-2">
+          <FaHdd className="text-danger" /> Backups
+        </div>
 
-        <hr className='w-full my-[20px] border-gray-300' />
+        <hr />
 
-        <li className='flex items-center text-[20px] cursor-pointer font-semibold mt-[20px] transition-colors duration-100'>
-          <FaChartBar className='mr-[15px] text-red-500 ' /> 
-          Charts
-        </li>
+        <div className="list-group-item d-flex align-items-center gap-2">
+          <FaChartBar className="text-danger" /> Charts
+        </div>
 
-        <li className='flex items-center text-[20px] cursor-pointer font-semibold mt-[20px] transition-colors duration-100'>
-          <FaClipboard className='mr-[15px] text-red-500 ' /> 
-          All logs
-        </li>
+        <div className="list-group-item d-flex align-items-center gap-2">
+          <FaClipboard className="text-danger" /> All logs
+        </div>
 
-        <li className='flex items-center text-[20px] cursor-pointer font-semibold mt-[20px] transition-colors duration-100'>
-          <FaCalendarAlt className='mr-[15px] text-red-500 ' /> 
-          Calender
-        </li>
-      </ul>
+        <div className="list-group-item d-flex align-items-center gap-2">
+          <FaCalendarAlt className="text-danger" /> Calendar
+        </div>
 
+      </div>
     </div>
-  )
-}
+  );
+};
 
-export default Menu
+export default Menu;

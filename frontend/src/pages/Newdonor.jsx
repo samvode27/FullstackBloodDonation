@@ -2,30 +2,34 @@ import React, { useState } from 'react'
 import { publicRequest } from '../requestMethods'
 import { ToastContainer, toast } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css";
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 
 const Newdonor = () => {
 
-  const [inputs, setInputs] = useState({})
-  const user = useSelector((state) => state.user)
+  const [inputs, setInputs] = useState({});
+  
+  // Get admin from Redux state (not 'user')
+  const admin = useSelector((state) => state.admin);
 
   const handleChange = (e) => {
     setInputs((prev) => {
       return { ...prev, [e.target.name]: e.target.value }
-    })
-  }
+    });
+  };
 
   const handleDonors = async () => {
     try {
       await publicRequest.post("/donors", inputs, {
-        Authorization: {token: `Bearer ${user.currentUser.accessToken}`}
-      })
-      toast.success("Donor has been seccesfully created to the data base")
-      setInputs({})
+        headers: {
+          Authorization: `Bearer ${admin.currentUser.accessToken}`
+        }
+      });
+      toast.success("Donor has been successfully created in the database");
+      setInputs({});
     } catch (error) {
-      toast.warning(error.message)
+      toast.warning(error.response?.data?.message || error.message);
     }
-  }
+  };
 
   return (
     <div className='flex flex-center justify-center min-h-screen'>
@@ -71,7 +75,7 @@ const Newdonor = () => {
           <input type="Number" placeholder='1234567' name='tel' value={inputs.tel || ""} onChange={handleChange} className='border-[#555] border-2 border-solid p-[10px] w-[300px]' />
 
           <label className='text=[18px] mt-[10px] font-semibold'>Do you have any diseases?</label>
-          <textarea className='border-[#555] border-2 border-solid p-[10px] w-[300px]' name='disease' value={inputs.disease || ""} onChange={handleChange} type="text" placeholder='N/A' />
+          <textarea className='border-[#555] border-2 border-solid p-[10px] w-[300px]' name='disease' value={inputs.disease || ""} onChange={handleChange} placeholder='N/A' />
 
           <button className='bg-[#444] cursor-pointer text-white p-[10px] w-[300px] my-[10px]' onClick={handleDonors}>Create</button>
           <ToastContainer />
@@ -79,7 +83,7 @@ const Newdonor = () => {
       </div>
 
     </div>
-  )
-}
+  );
+};
 
-export default Newdonor
+export default Newdonor;

@@ -1,7 +1,13 @@
 const express = require("express");
 const { verifyToken } = require("../middlewares/verifyToken");
-const { createHospital, getAllHospitals, updateHospital, getOneHospital, deleteHospital, getHospitalStats } = require("../cotrollers/hospital");
+const { createHospital, getAllHospitals, updateHospital, getOneHospital, deleteHospital, getHospitalStats, loginHospital, registerHospital } = require("../cotrollers/hospital");
 const router = express.Router();
+
+//Register Hospital
+router.post('/hospitallogin', loginHospital)
+
+//Login Hospital
+router.post('/hospitalregister', registerHospital)
 
 //add Hospital
 router.post('/', createHospital)
