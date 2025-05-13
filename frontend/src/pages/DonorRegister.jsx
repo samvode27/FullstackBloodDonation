@@ -3,8 +3,11 @@ import { publicRequest } from '../requestMethods';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const DonorRegister = () => {
+  const navigate = useNavigate();
+
   const [inputs, setInputs] = useState({});
 
   const handleChange = (e) => {
@@ -12,15 +15,20 @@ const DonorRegister = () => {
     setInputs((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleProspects = async (e) => {
+  const handleDonors = async (e) => {
     e.preventDefault();
     try {
       await publicRequest.post("/donors", inputs);
       toast.success("Donor registered successfully.");
       setInputs({});
+      setTimeout(() => {
+        navigate('/donorlogin');
+      }, 2000);
     } catch (error) {
-      toast.error("Registration failed: " + error.message);
+      console.error("Registration error:", error.response?.data || error.message);
+      toast.error("Registration failed: " + (error.response?.data?.message || error.message));
     }
+
   };
 
   return (
@@ -45,7 +53,7 @@ const DonorRegister = () => {
         <div className="card shadow-sm p-4 w-100" style={{ maxWidth: '600px' }}>
           <h2 className="text-center mb-4">Donor Registration</h2>
 
-          <form onSubmit={handleProspects} noValidate>
+          <form onSubmit={handleDonors} noValidate>
             <div className="mb-3">
               <label htmlFor="name" className="form-label">Full Name</label>
               <input
@@ -69,6 +77,20 @@ const DonorRegister = () => {
                 name="email"
                 placeholder="johndoe@example.com"
                 value={inputs.email || ""}
+                onChange={handleChange}
+                required
+              />
+            </div>
+
+            <div className="mb-3">
+              <label htmlFor="password" className="form-label">Password</label>
+              <input
+                type="password"
+                className="form-control"
+                id="password"
+                name="password"
+                placeholder="********"
+                value={inputs.password || ""}
                 onChange={handleChange}
                 required
               />

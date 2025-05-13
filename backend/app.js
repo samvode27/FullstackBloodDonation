@@ -1,7 +1,8 @@
 const express = require('express')
 const cors = require("cors")
 const app = express()
-const authRoute = require('./routes/auth')
+
+const adminRoute = require('./routes/admin')
 const donorRoute = require('./routes/donor')
 const hospitalRoute = require('./routes/hospital')
 const prospectRoute = require('./routes/prospect')
@@ -15,7 +16,7 @@ app.use(cors())
 app.use(express.json())
 
 //Routes
-app.use('/api/v1/auth', authRoute)
+app.use('/api/v1/admin', adminRoute)
 app.use('/api/v1/donors', donorRoute)
 app.use('/api/v1/hospitals', hospitalRoute)
 app.use('/api/v1/prospects', prospectRoute)

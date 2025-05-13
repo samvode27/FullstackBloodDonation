@@ -3,8 +3,11 @@ import { publicRequest } from '../requestMethods';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const HospitalRegister = () => {
+  const navigate = useNavigate();
+
   const [inputs, setInputs] = useState({});
 
   const handleChange = (e) => {
@@ -12,21 +15,25 @@ const HospitalRegister = () => {
     setInputs((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleProspects = async (e) => {
+  const handleHopsitals = async (e) => {
     e.preventDefault();
     try {
-      await publicRequest.post("/donors", inputs);
+      await publicRequest.post("/hospitals", inputs);
       toast.success("Hospital registered successfully.");
       setInputs({});
+      setTimeout(() => {
+        navigate('/hospitallogin');
+      }, 2000);
     } catch (error) {
       toast.error("Failed to register: " + error.message);
+      console.error(error);
     }
   };
 
   return (
     <>
       <ToastContainer position="top-center" />
-      
+
       <nav className="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
         <div className="container">
           <a className="navbar-brand" href="/">
@@ -45,7 +52,7 @@ const HospitalRegister = () => {
         <div className="card shadow p-4 w-100" style={{ maxWidth: '500px' }}>
           <h2 className="text-center mb-4">Hospital Registration</h2>
 
-          <form onSubmit={handleProspects} noValidate>
+          <form onSubmit={handleHopsitals} noValidate>
             <div className="mb-3">
               <label htmlFor="name" className="form-label">Hospital Name</label>
               <input
@@ -69,6 +76,20 @@ const HospitalRegister = () => {
                 name="email"
                 placeholder="hospital@example.com"
                 value={inputs.email || ""}
+                onChange={handleChange}
+                required
+              />
+            </div>
+
+            <div className="mb-3">
+              <label htmlFor="password" className="form-label">Hospital Password</label>
+              <input
+                type="password"
+                className="form-control"
+                id="password"
+                name="password"
+                placeholder="********"
+                value={inputs.password || ""}
                 onChange={handleChange}
                 required
               />
@@ -106,7 +127,7 @@ const HospitalRegister = () => {
 
             <div className="text-center">
               <span>Already have an account? </span>
-              <Link to="/login" className="fw-semibold text-decoration-none">
+              <Link to="/hospitallogin" className="fw-semibold text-decoration-none">
                 Log In
               </Link>
             </div>

@@ -1,5 +1,8 @@
 import { configureStore } from "@reduxjs/toolkit";
-import userReducer from "./userRedux";
+
+import adminReducer from './adminRedux'
+import donorReducer from "./donorRedux";
+import hospitalReducer from "./hospitalRedux";
 
 import {
   persistStore,
@@ -13,17 +16,31 @@ import {
 } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 
-const persistConfig = {
-  key: "root",
+const adminPersistConfig = {
+  key: "admin",
   version: 1,
   storage,
 };
 
-const persistedReducer = persistReducer(persistConfig, userReducer);
+const donorPersistConfig = {
+  key: "donor",
+  version: 1,
+  storage,
+};
+
+const hospitalPersistConfig = {
+  key: "hospital",
+  version: 1,
+  storage,
+};
+
+// const persistedReducer = persistReducer(persistConfig, userReducer);
 
 export const store = configureStore({
   reducer: {
-    user: persistedReducer,
+    admin: persistReducer(adminPersistConfig, adminReducer),
+    donor: persistReducer(donorPersistConfig, donorReducer),
+    hospital: persistReducer(hospitalPersistConfig, hospitalReducer),
     
   },
 

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { FaUser } from 'react-icons/fa';
 import { publicRequest } from '../requestMethods';
-import { logout } from '../redux/userRedux';
+import { logout } from '../redux/adminRedux';
 import { useNavigate } from "react-router-dom"
 import { useDispatch } from 'react-redux'
 
@@ -30,7 +30,7 @@ const Admin = () => {
 
   const handleLogout = () => {
     dispatch(logout())
-    navigate("/login")
+    navigate("/")
   }
 
   return (
