@@ -4,7 +4,7 @@ const hospitalSlice = createSlice({
    name: "hospital",
    
    initialState: {
-      currentUser: null,
+      hospitalcurrentUser: null,
       isFetching: false,
       error: false
    },

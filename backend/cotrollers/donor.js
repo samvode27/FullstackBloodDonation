@@ -1,11 +1,9 @@
-const CryptoJs = require("crypto-js");
 const jwt = require("jsonwebtoken");
 const { signupSchema, signinSchema, changePasswordSchema,acceptCodeSchema, acceptForgotPasswordCodeSchema } = require("../middlewares/validator");
 const Donor = require("../Models/Donor");
 const transport = require('../middlewares/sendMail');
 const dotenv = require("dotenv");
 dotenv.config();
-const sendEmail = require('../utils/sendMail')
 const { doHash, doHashValidation, hmacProcces } = require("../utils/hasing");
 
 
@@ -25,7 +23,7 @@ const signup = async (req, res) => {
       if(existingDonor){
           return res.status(401).json({
             success: false,
-            message: 'User already exists!'                                                                                            
+            message: 'Donor already exists!'                                                                                            
          })                                                                                                
       }
 
@@ -81,7 +79,7 @@ const signin =  async (req, res) => {
          email: existingDonor.email,
          verified: existingDonor.verified,
       }, 
-         process.env.TOKEN_SECRET,{
+         process.env.JWT_SEC,{
             expiresIn: '8hr'
          }
       );
@@ -92,7 +90,7 @@ const signin =  async (req, res) => {
       }).json({
          success: true,
          token,
-         message: 'logged in successfully'
+         message: 'Donor logged in successfully'
       })
 
    } catch (error) {
@@ -166,7 +164,7 @@ const verifyVerificationCode = async (req, res) => {
       }
  
       const codeValue = providedCode.toString()
-      const existingDonor = await User.findOne({email}).select("+verificationCode +verificationCodeValidation")
+      const existingDonor = await Donor.findOne({email}).select("+verificationCode +verificationCodeValidation")
 
       if(!existingDonor){
          return res.status(401).json({
@@ -265,7 +263,7 @@ const changePassword = async (req, res) => {
 const sendForgotPasswordCode = async (req, res) => {
    const {email} = req.body;
    try {
-      const existingDonor = await User.findOne({email})
+      const existingDonor = await Donor.findOne({email})
       if(!existingDonor){
          return res.status(404)
                    .json({
@@ -321,12 +319,12 @@ const verifyForgotPasswordCode = async (req, res) => {
       }
  
       const codeValue = providedCode.toString()
-      const existingDonor = await User.findOne({email}).select("+forgotPasswordCode +forgotPasswordCodeValidation")
+      const existingDonor = await Donor.findOne({email}).select("+forgotPasswordCode +forgotPasswordCodeValidation")
 
       if(!existingDonor){
          return res.status(401).json({
            success: false,
-           message: 'User does not exists!'                                                                                            
+           message: 'Donor does not exists!'                                                                                            
         })                                                                                                
       }
  
@@ -369,22 +367,22 @@ const verifyForgotPasswordCode = async (req, res) => {
 const createDonor = async (req, res) => {
    try {
      let password = req.body.password;
- 
-     if (password && process.env.PASS) {
-       password = CryptoJs.AES.encrypt(password, process.env.PASS).toString();
+
+     if (password) {
+       password = await doHash(password, 12); // bcrypt hash instead of AES
      }
- 
+
      const newDonor = new Donor({
        ...req.body,
        password,
      });
- 
+
      const donor = await newDonor.save();
      res.status(201).json(donor);
    } catch (error) {
      res.status(500).json({ error: error.message });
    }
- };
+};
  
 //getAllDonor
 const getAllDonor = async (req, res) => {
@@ -395,7 +393,6 @@ const getAllDonor = async (req, res) => {
       res.status(500).json(error)
    }
 }
-
 
 //Update Donor
 const updateDonor = async (req, res) => {

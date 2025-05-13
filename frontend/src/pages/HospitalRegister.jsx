@@ -3,8 +3,11 @@ import { publicRequest } from '../requestMethods';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const HospitalRegister = () => {
+  const navigate = useNavigate();
+
   const [inputs, setInputs] = useState({});
 
   const handleChange = (e) => {
@@ -18,15 +21,19 @@ const HospitalRegister = () => {
       await publicRequest.post("/hospitals", inputs);
       toast.success("Hospital registered successfully.");
       setInputs({});
+      setTimeout(() => {
+        navigate('/hospitallogin');
+      }, 2000);
     } catch (error) {
       toast.error("Failed to register: " + error.message);
+      console.error(error);
     }
   };
 
   return (
     <>
       <ToastContainer position="top-center" />
-      
+
       <nav className="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
         <div className="container">
           <a className="navbar-brand" href="/">
@@ -73,7 +80,7 @@ const HospitalRegister = () => {
                 required
               />
             </div>
-            
+
             <div className="mb-3">
               <label htmlFor="password" className="form-label">Hospital Password</label>
               <input

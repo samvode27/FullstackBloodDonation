@@ -1,13 +1,19 @@
 const express = require("express");
-const { verifyToken } = require("../middlewares/verifyToken");
-const { createHospital, getAllHospitals, updateHospital, getOneHospital, deleteHospital, getHospitalStats, loginHospital, registerHospital } = require("../cotrollers/hospital");
+const { createHospital, getAllHospitals, updateHospital, getOneHospital, deleteHospital, getHospitalStats, signup, signin, sendVerificationCode, verifyVerificationCode, changePassword, sendForgotPasswordCode, verifyForgotPasswordCode } = require("../cotrollers/hospital");
 const router = express.Router();
+const { identifier } = require('../middlewares/identification');
 
-//Register Hospital
-router.post('/hospitallogin', loginHospital)
 
-//Login Hospital
-router.post('/hospitalregister', registerHospital)
+router.post('/signup', signup)
+router.post('/signin', signin)
+
+router.patch('/sendverificationcode', identifier, sendVerificationCode)
+router.patch('/verifyverificationcode', identifier, verifyVerificationCode)
+router.patch('/changepassword', identifier, changePassword)
+
+router.patch('/sendforgotpasswordcode', sendForgotPasswordCode)
+router.patch('/verifyforgotpasswordcode', verifyForgotPasswordCode)
+
 
 //add Hospital
 router.post('/', createHospital)

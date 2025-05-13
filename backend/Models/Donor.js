@@ -31,6 +31,25 @@ const donorSchema = mongoose.Schema({
         trim: true,
         select: false
     },
+
+    address: { type: String },
+
+    tel: { type: String },
+
+    bloodgroup: { type: String },
+
+    weight: { type: Number },
+
+    date: { type: String },
+
+    disease: { type: String },
+
+    age: { type: Number },
+
+    bloodpresure: { type: Number },
+
+    status: { type: Number, default: 0 },
+    
     verified: {
         type: Boolean,
         default: false

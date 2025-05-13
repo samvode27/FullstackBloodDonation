@@ -80,9 +80,9 @@ const DonorLogin = () => {
             </button>
 
             <div>
-              <a href="#" className="hover:text-gray-600 font-semibold w-6 h-6 ml-5 text-lg">
+              <Link to="/hospitalforgot" className="hover:text-gray-600 font-semibold w-6 h-6 ml-5 text-lg">
                 Forgot your Password?
-              </a>
+              </Link>
               <Link to="/donorregister" className="hover:text-gray-600 font-semibold w-6 h-6 ml-5 text-lg">
                 Create an Account
               </Link>

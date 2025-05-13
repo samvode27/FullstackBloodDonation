@@ -26,7 +26,7 @@ const identifier = (req, res, next) => {
          const userToken = token.split(' ')[1];
 
          // Verify the JWT
-         const jwtVerified = jwt.verify(userToken, process.env.TOKEN_SECRET);
+         const jwtVerified = jwt.verify(userToken, process.env.JWT_SEC);
 
          if (jwtVerified) {
             req.user = jwtVerified;

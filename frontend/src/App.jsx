@@ -23,10 +23,12 @@ import NewHospital from './pages/NewHospital';
 import DonorPage from './pages/page/DonorPage';
 import HospitalPage from './pages/page/HospitalPage';
 import AdminRegister from './pages/AdminRegister';
+import DonorForgot from './pages/DonorForgot';
+import HospitalForgot from './pages/HospitalForgot';
 
 function App() {
   const admin = useSelector((state) => state.admin);  // Get the entire admin state
-  console.log(admin)
+
 
   // Create a Layout component for admin
   const Layout = () => {
@@ -47,12 +49,17 @@ function App() {
     { path: '/', element: <Home /> },
     { path: '/adminlogin', element: <AdminLogin /> },
     { path: '/adminregister', element: <AdminRegister /> },
+
     { path: '/donorlogin', element: <DonorLogin /> },
     { path: '/donorregister', element: <DonorRegister /> },
+    { path: '/donorforgot', element: <DonorForgot /> },
+
     { path: '/hospitallogin', element: <HospitalLogin /> },
     { path: '/hospitalregister', element: <HospitalRegister /> },
+
     { path: '/donorpage', element: <DonorPage /> },
     { path: '/hospitalpage', element: <HospitalPage /> },
+    { path: '/hospitalforgot', element: <HospitalForgot /> },
 
     {
       path: '/admin',

@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
+import { useDispatch } from 'react-redux'
+import { useNavigate } from "react-router-dom"
+import { logout } from '../../redux/hospitalRedux';
 
 const HospitalPage = () => {
   const [bloodRequests, setBloodRequests] = useState([]);
@@ -75,10 +78,10 @@ const HospitalPage = () => {
       prev.map((req) =>
         req.id === selectedRequestId
           ? {
-              ...req,
-              transfusionLog: { ...transfusionData },
-              status: 'Transfused',
-            }
+            ...req,
+            transfusionLog: { ...transfusionData },
+            status: 'Transfused',
+          }
           : req
       )
     );
@@ -87,9 +90,22 @@ const HospitalPage = () => {
     setShowTransfusionModal(false);
   };
 
+  const navigate = useNavigate()
+  const dispatch = useDispatch()
+  const handleLogout = () => {
+    dispatch(logout())
+    navigate("/")
+  }
+
   return (
     <div className="container py-5">
-      <h2 className="mb-4 text-primary">🏥 Hospital Blood Bank System</h2>
+      <div className="d-flex justify-content-between align-items-center mb-4">
+        <h2 className="text-primary">🏥 Hospital Blood Bank System</h2>
+        <button className="btn btn-outline-danger" onClick={handleLogout}>
+          Logout
+        </button>
+      </div>
+
 
       {toast && (
         <div
@@ -211,13 +227,12 @@ const HospitalPage = () => {
                     <td>{req.quantity}</td>
                     <td>
                       <span
-                        className={`badge bg-${
-                          req.urgency === 'Critical'
-                            ? 'danger'
-                            : req.urgency === 'Urgent'
+                        className={`badge bg-${req.urgency === 'Critical'
+                          ? 'danger'
+                          : req.urgency === 'Urgent'
                             ? 'warning'
                             : 'info'
-                        }`}
+                          }`}
                       >
                         {req.urgency}
                       </span>

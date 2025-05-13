@@ -1,15 +1,19 @@
 import React, { useState } from 'react';
 import { Container, Row, Col, Card, Button, Modal, Form, Nav, Navbar } from 'react-bootstrap';
+import { useDispatch } from 'react-redux'
+import { useNavigate } from "react-router-dom"
+import { useSelector } from 'react-redux';
+import { logout } from '../../redux/donorRedux';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { 
-  faHeartbeat, 
-  faUser, 
-  faHandHoldingHeart, 
-  faSearch, 
-  faVenusMars, 
-  faVenus, 
-  faMapMarkerAlt, 
-  faEnvelope, 
+import {
+  faHeartbeat,
+  faUser,
+  faHandHoldingHeart,
+  faSearch,
+  faVenusMars,
+  faVenus,
+  faMapMarkerAlt,
+  faEnvelope,
   faClock,
   faTimes,
   faPhone,
@@ -21,6 +25,28 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 
 const DonorPage = () => {
+
+
+  const getLoggedDonor = () => {
+    const donorState = localStorage.getItem("persist:donor");
+    if (donorState) {
+      try {
+        const parsedState = JSON.parse(donorState);
+        return JSON.parse(parsedState.currentDonor);
+      } catch (e) {
+        console.error("Failed to parse donor from localStorage:", e);
+      }
+    }
+    return null;
+  };
+
+  const reduxDonor = useSelector((state) => state.donor?.currentDonor);
+  const donor = reduxDonor || getLoggedDonor();
+
+  const [showAccount, setShowAccount] = useState(false);
+  const toggleAccount = () => setShowAccount(!showAccount);
+
+
 
   const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState({
@@ -112,8 +138,41 @@ const DonorPage = () => {
     }
   ];
 
+  const navigate = useNavigate()
+  const dispatch = useDispatch()
+  const handleLogout = () => {
+    dispatch(logout())
+    navigate("/")
+  }
+
   return (
+
+    
     <div className="App">
+
+<Modal show={showAccount} onHide={toggleAccount} centered>
+  <Modal.Header closeButton>
+    <Modal.Title>Your Account</Modal.Title>
+  </Modal.Header>
+  <Modal.Body>
+    {donor ? (
+      <>
+        <p><strong>Name:</strong> {donor.firstName} {donor.lastName}</p>
+        <p><strong>Email:</strong> {donor.email}</p>
+        <p><strong>Phone:</strong> {donor.phone}</p>
+        <p><strong>Blood Type:</strong> {donor.bloodType}</p>
+        <p><strong>Gender:</strong> {donor.gender}</p>
+        <p><strong>Date of Birth:</strong> {donor.dob}</p>
+        <p><strong>Address:</strong> {donor.address}, {donor.city}, {donor.state}, {donor.zipCode}, {donor.country}</p>
+        <p><strong>Last Donation:</strong> {donor.lastDonation || "N/A"}</p>
+      </>
+    ) : (
+      <p>No account info available.</p>
+    )}
+  </Modal.Body>
+</Modal>
+
+
       {/* Header */}
       <Navbar bg="danger" variant="dark" expand="lg" className="shadow-lg">
         <Container>
@@ -129,10 +188,16 @@ const DonorPage = () => {
               <Nav.Link href="#find-donors" className="text-light">Find Donors</Nav.Link>
               <Nav.Link href="#about" className="text-light">About</Nav.Link>
             </Nav>
-            <Button variant="light" className="text-danger fw-bold">
-              <FontAwesomeIcon icon={faUser} className="me-2" />
-              Login
-            </Button>
+            <div className="d-flex align-items-center gap-3">
+              <Button variant="light" className="text-danger fw-bold" onClick={toggleAccount}>
+                <FontAwesomeIcon icon={faUser} className="me-2" />
+                Account
+              </Button>
+              <Button variant="outline-light" onClick={handleLogout}>
+                Logout
+              </Button>
+            </div>
+
           </Navbar.Collapse>
         </Container>
       </Navbar>
@@ -145,9 +210,9 @@ const DonorPage = () => {
             Join our community of heroes who donate blood and save lives. Your single donation can help up to 3 people.
           </p>
           <div className="d-flex justify-content-center gap-3">
-            <Button 
-              variant="light" 
-              size="lg" 
+            <Button
+              variant="light"
+              size="lg"
               className="text-danger fw-bold pulse-animation"
               onClick={handleShow}
             >
@@ -225,24 +290,24 @@ const DonorPage = () => {
                   <Col md={6}>
                     <Form.Group className="mb-3">
                       <Form.Label>First Name*</Form.Label>
-                      <Form.Control 
-                        type="text" 
+                      <Form.Control
+                        type="text"
                         name="firstName"
                         value={formData.firstName}
                         onChange={handleInputChange}
-                        required 
+                        required
                       />
                     </Form.Group>
                   </Col>
                   <Col md={6}>
                     <Form.Group className="mb-3">
                       <Form.Label>Last Name*</Form.Label>
-                      <Form.Control 
-                        type="text" 
+                      <Form.Control
+                        type="text"
                         name="lastName"
                         value={formData.lastName}
                         onChange={handleInputChange}
-                        required 
+                        required
                       />
                     </Form.Group>
                   </Col>
@@ -251,24 +316,24 @@ const DonorPage = () => {
                   <Col md={6}>
                     <Form.Group className="mb-3">
                       <Form.Label>Email*</Form.Label>
-                      <Form.Control 
-                        type="email" 
+                      <Form.Control
+                        type="email"
                         name="email"
                         value={formData.email}
                         onChange={handleInputChange}
-                        required 
+                        required
                       />
                     </Form.Group>
                   </Col>
                   <Col md={6}>
                     <Form.Group className="mb-3">
                       <Form.Label>Phone*</Form.Label>
-                      <Form.Control 
-                        type="tel" 
+                      <Form.Control
+                        type="tel"
                         name="phone"
                         value={formData.phone}
                         onChange={handleInputChange}
-                        required 
+                        required
                       />
                     </Form.Group>
                   </Col>
@@ -277,19 +342,19 @@ const DonorPage = () => {
                   <Col md={6}>
                     <Form.Group className="mb-3">
                       <Form.Label>Date of Birth*</Form.Label>
-                      <Form.Control 
-                        type="date" 
+                      <Form.Control
+                        type="date"
                         name="dob"
                         value={formData.dob}
                         onChange={handleInputChange}
-                        required 
+                        required
                       />
                     </Form.Group>
                   </Col>
                   <Col md={6}>
                     <Form.Group className="mb-3">
                       <Form.Label>Blood Type*</Form.Label>
-                      <Form.Select 
+                      <Form.Select
                         name="bloodType"
                         value={formData.bloodType}
                         onChange={handleInputChange}
@@ -312,7 +377,7 @@ const DonorPage = () => {
                   <Col md={6}>
                     <Form.Group className="mb-3">
                       <Form.Label>Gender*</Form.Label>
-                      <Form.Select 
+                      <Form.Select
                         name="gender"
                         value={formData.gender}
                         onChange={handleInputChange}
@@ -329,8 +394,8 @@ const DonorPage = () => {
                   <Col md={6}>
                     <Form.Group className="mb-3">
                       <Form.Label>Last Donation Date</Form.Label>
-                      <Form.Control 
-                        type="date" 
+                      <Form.Control
+                        type="date"
                         name="lastDonation"
                         value={formData.lastDonation}
                         onChange={handleInputChange}
@@ -340,36 +405,36 @@ const DonorPage = () => {
                 </Row>
                 <Form.Group className="mb-3">
                   <Form.Label>Address*</Form.Label>
-                  <Form.Control 
-                    type="text" 
+                  <Form.Control
+                    type="text"
                     name="address"
                     value={formData.address}
                     onChange={handleInputChange}
-                    required 
+                    required
                   />
                 </Form.Group>
                 <Row className="mb-3">
                   <Col md={6}>
                     <Form.Group className="mb-3">
                       <Form.Label>City*</Form.Label>
-                      <Form.Control 
-                        type="text" 
+                      <Form.Control
+                        type="text"
                         name="city"
                         value={formData.city}
                         onChange={handleInputChange}
-                        required 
+                        required
                       />
                     </Form.Group>
                   </Col>
                   <Col md={6}>
                     <Form.Group className="mb-3">
                       <Form.Label>State*</Form.Label>
-                      <Form.Control 
-                        type="text" 
+                      <Form.Control
+                        type="text"
                         name="state"
                         value={formData.state}
                         onChange={handleInputChange}
-                        required 
+                        required
                       />
                     </Form.Group>
                   </Col>
@@ -378,30 +443,30 @@ const DonorPage = () => {
                   <Col md={6}>
                     <Form.Group className="mb-3">
                       <Form.Label>Zip Code*</Form.Label>
-                      <Form.Control 
-                        type="text" 
+                      <Form.Control
+                        type="text"
                         name="zipCode"
                         value={formData.zipCode}
                         onChange={handleInputChange}
-                        required 
+                        required
                       />
                     </Form.Group>
                   </Col>
                   <Col md={6}>
                     <Form.Group className="mb-3">
                       <Form.Label>Country*</Form.Label>
-                      <Form.Control 
-                        type="text" 
+                      <Form.Control
+                        type="text"
                         name="country"
                         value={formData.country}
                         onChange={handleInputChange}
-                        required 
+                        required
                       />
                     </Form.Group>
                   </Col>
                 </Row>
                 <Form.Group className="mb-4">
-                  <Form.Check 
+                  <Form.Check
                     type="checkbox"
                     label="I agree to the terms and conditions and confirm that all information provided is accurate.*"
                     name="agreeTerms"

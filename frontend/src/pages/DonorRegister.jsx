@@ -3,8 +3,11 @@ import { publicRequest } from '../requestMethods';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const DonorRegister = () => {
+  const navigate = useNavigate();
+
   const [inputs, setInputs] = useState({});
 
   const handleChange = (e) => {
@@ -18,9 +21,14 @@ const DonorRegister = () => {
       await publicRequest.post("/donors", inputs);
       toast.success("Donor registered successfully.");
       setInputs({});
+      setTimeout(() => {
+        navigate('/donorlogin');
+      }, 2000);
     } catch (error) {
-      toast.error("Registration failed: " + error.message);
+      console.error("Registration error:", error.response?.data || error.message);
+      toast.error("Registration failed: " + (error.response?.data?.message || error.message));
     }
+
   };
 
   return (
