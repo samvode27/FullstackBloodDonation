@@ -1,18 +1,28 @@
-const {createHmac} = require('crypto')
-const { hash, compare } = require('bcryptjs')
+const { createHmac } = require('crypto');
+const { hash, compare } = require('bcryptjs');
 
-const doHash = (value, saltValue) => {
-   const result = hash(value, saltValue)
-   return result;                                                                                                     
-}
+const doHash = async (value, saltValue) => {
+   try {
+      const result = await hash(value, saltValue);
+      return result;
+   } catch (error) {
+      console.error('Error hashing password:', error);
+      return null;
+   }
+};
 
-const doHashValidation = (value, hashedValue) => {
-   const result = compare(value, hashedValue)
-   return result;
-}
+const doHashValidation = async (value, hashedValue) => {
+   try {
+      const result = await compare(value, hashedValue);
+      return result;
+   } catch (error) {
+      console.error('Error comparing password:', error);
+      return false;
+   }
+};
 
 const hmacProcces = (value, key) => {
-   const result = createHmac('sha256', key).update(value).digest('hex')
-   return result;
-}
-module.exports = {doHash, doHashValidation, hmacProcces}
+   return createHmac('sha256', key).update(value).digest('hex');
+};
+
+module.exports = { doHash, doHashValidation, hmacProcces };

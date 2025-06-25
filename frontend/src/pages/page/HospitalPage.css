@@ -1,0 +1,31 @@
+.badge {
+  display: inline-block;
+  padding: 0.35em 0.6em;
+  font-size: 0.875em;
+  font-weight: 600;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  border-radius: 0.25rem;
+  position: relative;
+  top: auto;
+  left: auto;
+}
+
+.badge-success {
+  background-color: #28a745 !important;
+}
+
+.badge-danger {
+  background-color: #dc3545 !important;
+}
+
+.badge-warning {
+  background-color: #ffc107 !important;
+  color: #000 !important;
+}
+
+.badge-secondary {
+  background-color: #6c757d !important;
+}

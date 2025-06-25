@@ -1,22 +1,7 @@
-// const mongoose = require("mongoose");
-
-// const donorSchema = mongoose.Schema({
-//     name:{type:String, require:true},
-//     email:{type:String, require:true},
-//     password:{type:String, require:true},
-//     status:{type:Number, default:0},
-//     role:{type:String}
-// },{
-// timestamp:true
-// })
-
-// module.exports = mongoose.model("Donor", donorSchema)
-
-
 const mongoose = require('mongoose')
 
 const donorSchema = mongoose.Schema({
-    name: { type: String, require: true },
+    name: { type: String, required: true },
     email: {
         type: String,
         required: [true, 'Email is required'],
@@ -27,18 +12,32 @@ const donorSchema = mongoose.Schema({
     },
     password: {
         type: String,
-        required: [true, 'Password must be provided'],
+        required: false,
         trim: true,
-        select: false
+        validate: {
+            validator: function (value) {
+                console.log('📌 Password value during validation:', value);
+                return typeof value === 'string' && value.length > 0;
+            },
+            message: 'Password must be provided'
+        }
     },
 
     address: { type: String },
 
     tel: { type: String },
 
+    dateOfBirth: Date,
+
     bloodgroup: { type: String },
 
     weight: { type: Number },
+
+    donationAmount: {
+        type: Number,
+        required: true,
+        default: 0
+    },
 
     date: { type: String },
 
@@ -49,7 +48,7 @@ const donorSchema = mongoose.Schema({
     bloodpresure: { type: Number },
 
     status: { type: Number, default: 0 },
-    
+
     verified: {
         type: Boolean,
         default: false
@@ -70,8 +69,46 @@ const donorSchema = mongoose.Schema({
         type: Number,
         select: false
     },
+
+    profileImage: { type: String },
+
+    donationHistory: [
+        {
+            amount: Number,
+            date: Date,
+            hospital: String,
+            disease: String,
+            bloodgroup: String,
+            age: Number,
+            weight: Number
+        }
+    ],
+
+    rating: {
+        type: Number,
+        default: 0,
+    },
+    numberOfDonations: {
+        type: Number,
+        default: 0,
+    },
+    lastDonationDate: {
+        type: Date,
+        default: null
+    },
+    lastReminderDate: {
+        type: Date,
+        default: null
+    },
+    nextDonationDate: {
+        type: Date,
+        default: null
+    },
+
+
+
 }, {
     timestamps: true
 });
 
-module.exports = mongoose.model('Donor', donorSchema)
+module.exports = mongoose.models.Donor || mongoose.model('Donor', donorSchema);

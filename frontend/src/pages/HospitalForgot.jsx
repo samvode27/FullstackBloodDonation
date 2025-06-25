@@ -40,12 +40,12 @@ const HospitalForgot = () => {
   };
 
   return (
-    <div className="container d-flex justify-content-center align-items-center min-vh-100">
+    <div className="forgot-wrapper d-flex justify-content-center align-items-center">
       <ToastContainer position="top-center" />
-      <div className="card p-4 shadow" style={{ maxWidth: '500px', width: '100%' }}>
-        <h3 className="text-center mb-4">Hospital Forgot Password</h3>
+      <div className="forgot-card card p-4 shadow" style={{ maxWidth: '500px', width: '100%' }}>
+        <h3 className="text-center text-danger mb-4">Hospital Forgot Password</h3>
         <form onSubmit={codeSent ? handleVerifyCode : handleSendCode}>
-          <div className="mb-3">
+          <div className="form-group mb-3">
             <label htmlFor="email" className="form-label">Email address</label>
             <input
               type="email"
@@ -59,7 +59,7 @@ const HospitalForgot = () => {
 
           {codeSent && (
             <>
-              <div className="mb-3">
+              <div className="form-group mb-3">
                 <label htmlFor="code" className="form-label">Verification Code</label>
                 <input
                   type="text"
@@ -70,7 +70,7 @@ const HospitalForgot = () => {
                   onChange={(e) => setCode(e.target.value)}
                 />
               </div>
-              <div className="mb-3">
+              <div className="form-group mb-3">
                 <label htmlFor="newPassword" className="form-label">New Password</label>
                 <input
                   type="password"

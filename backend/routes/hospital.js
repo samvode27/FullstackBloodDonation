@@ -1,36 +1,77 @@
 const express = require("express");
-const { createHospital, getAllHospitals, updateHospital, getOneHospital, deleteHospital, getHospitalStats, signup, signin, sendVerificationCode, verifyVerificationCode, changePassword, sendForgotPasswordCode, verifyForgotPasswordCode } = require("../cotrollers/hospital");
 const router = express.Router();
-const { identifier } = require('../middlewares/identification');
+const path = require("path");
+const multer = require("multer");
 
+const {createHospital, getAllHospitals,
+  updateHospital,
+  getOneHospital,
+  deleteHospital,
+  getHospitalStats,
+  signup,
+  signin,
+  sendVerificationCode,
+  verifyVerificationCode,
+  changePassword,
+  sendForgotPasswordCode,
+  verifyForgotPasswordCode,
+  getMyProfile,
+  updateProfileInfo,
+  uploadProfilePicture
+} = require("../cotrollers/hospital");
 
-router.post('/signup', signup)
-router.post('/signin', signin)
+const { identifier } = require("../middlewares/identification");
+const { identifier1 } = require("../middlewares/identification1");
+const Hospital = require("../Models/Hospital");
 
-router.patch('/sendverificationcode', identifier, sendVerificationCode)
-router.patch('/verifyverificationcode', identifier, verifyVerificationCode)
-router.patch('/changepassword', identifier, changePassword)
+// === Multer setup ===
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads/"); // Uploads directory
+  },
+  filename: (req, file, cb) => {
+    const uniqueName =
+      Date.now() + "-" + Math.round(Math.random() * 1e9) + path.extname(file.originalname);
+    cb(null, uniqueName);
+  },
+});
 
-router.patch('/sendforgotpasswordcode', sendForgotPasswordCode)
-router.patch('/verifyforgotpasswordcode', verifyForgotPasswordCode)
+const upload = multer({ storage });
 
+// === Auth routes ===
+router.post('/signup', signup);
+router.post('/signin', signin);
 
-//add Hospital
-router.post('/', createHospital)
+// === Verification routes ===
+router.patch('/sendverificationcode', identifier, sendVerificationCode);
+router.patch('/verifyverificationcode', identifier, verifyVerificationCode);
+router.patch('/changepassword', identifier, changePassword);
+router.patch('/sendforgotpasswordcode', sendForgotPasswordCode);
+router.patch('/verifyforgotpasswordcode', verifyForgotPasswordCode);
 
-//get all Hospitals
-router.get('/', getAllHospitals)
+// === Profile routes ===
+router.get("/me", identifier1, getMyProfile);
+router.put("/updateprofile/:id", identifier1, updateProfileInfo);
+router.post("/uploadprofilepic", identifier1, upload.single("image"), uploadProfilePicture);
 
-//update hospitals
-router.put('/:id', updateHospital)
+// === Hospital CRUD ===
+router.post('/', createHospital);
+router.get('/', getAllHospitals);
+router.get('/stats', getHospitalStats);
+router.get('/find/:id', getOneHospital);
+router.put('/:id', updateHospital);
+router.delete('/:id', deleteHospital);
 
-//get One Hospital
-router.get('/find/:id', getOneHospital)
+// In hospitals.js route file
+router.get('/count', async (req, res) => {
+  try {
+    const all = await Hospital.find(); // 👈 log all to debug
+    const count = await Hospital.countDocuments();
+    res.status(200).json({ count });
+  } catch (err) {
+    res.status(500).json({ message: 'Failed to get donor count' });
+  }
+});
 
-//delete Hospital
-router.delete('/:id', deleteHospital)
-
-//donor Hospital Stats
-router.get('/stats', getHospitalStats)
 
 module.exports = router;

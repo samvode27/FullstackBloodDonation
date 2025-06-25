@@ -1,0 +1,15 @@
+/* src/pages/HospitalVerifyCode.css */
+.verify-wrapper {
+  background: linear-gradient(to bottom right, #e6f0ff, #f8f9fa);
+  padding: 1rem;
+}
+
+.verify-card {
+  background: #ffffff;
+  border: 1px solid #dee2e6;
+  transition: all 0.3s ease;
+}
+
+.verify-card:hover {
+  box-shadow: 0 0 15px rgba(0, 123, 255, 0.2);
+}

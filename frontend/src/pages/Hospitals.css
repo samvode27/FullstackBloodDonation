@@ -1,0 +1,392 @@
+/* src/pages/admin/Hospitals.css */
+
+.hospitals-page {
+  padding: 1rem 2rem;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #222;
+  background: #f5f7fa;
+  min-height: 100vh;
+}
+
+.page-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: #0b3d91;
+  text-align: center;
+}
+
+.top-bar {
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.search-input {
+  max-width: 400px;
+  width: 90%;
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  border-radius: 25px;
+  border: 2px solid #0b3d91;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+.search-input:focus {
+  border-color: #0654a6;
+  box-shadow: 0 0 8px rgba(6, 84, 166, 0.5);
+}
+
+/* Table styling */
+
+table {
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(15, 33, 55, 0.12);
+  overflow: hidden;
+}
+
+thead.table-light th {
+  user-select: none;
+  cursor: pointer;
+  position: relative;
+  transition: background-color 0.3s ease;
+}
+
+thead.table-light th:hover {
+  background-color: #e6f0ff;
+  color: #064273;
+}
+
+tbody tr:hover {
+  background-color: #f0f7ff;
+  cursor: default;
+}
+
+td,
+th {
+  vertical-align: middle !important;
+}
+
+.badge.bg-success {
+  background-color: #28a745 !important;
+}
+
+.badge.bg-danger {
+  background-color: #dc3545 !important;
+}
+
+/* Profile image in table */
+
+td img.rounded-circle {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: 50% !important;
+  border: 1.5px solid #0b3d91;
+}
+
+td div.bg-secondary {
+  width: 40px;
+  height: 40px;
+  font-weight: 700;
+  font-size: 1.25rem;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  user-select: none;
+  border: 1.5px solid #0b3d91;
+}
+
+/* Pagination styling */
+
+.pagination {
+  margin-top: 1rem;
+}
+
+.pagination .page-item.active .page-link {
+  background-color: #0b3d91;
+  border-color: #0b3d91;
+}
+
+.pagination .page-link {
+  color: #0b3d91;
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.pagination .page-link:hover {
+  background-color: #c3dbff;
+  color: #064273;
+}
+
+/* Stats panel */
+
+.stats-panel {
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 14px rgba(15, 33, 55, 0.15);
+  padding: 1.5rem;
+  height: fit-content;
+  margin-top: 2rem;
+  max-width: 320px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.stats-panel h2 {
+  margin-top: 0;
+  color: #064273;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  text-align: center;
+}
+
+.stats-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.stats-list li {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 600;
+  font-size: 1.1rem;
+  padding: 0.6rem 1rem;
+  border-radius: 6px;
+  margin-bottom: 0.6rem;
+  background: #e6f0ff;
+  color: #0b3d91;
+  transition: background-color 0.3s ease;
+}
+
+.stats-list li:hover {
+  background: #c3dbff;
+}
+
+.bloodgroup-label {
+  letter-spacing: 1.1px;
+}
+
+.count {
+  background: #0b3d91;
+  color: white;
+  padding: 0.15rem 0.7rem;
+  border-radius: 12px;
+  font-weight: 700;
+  min-width: 40px;
+  text-align: center;
+}
+
+/* Loading, error & empty states */
+
+.loading,
+.error,
+.empty {
+  text-align: center;
+  font-size: 1.2rem;
+  color: #666;
+  margin: 2rem 0;
+}
+
+/* Modal overrides for consistent colors */
+
+.modal-content {
+  border-radius: 12px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.modal-header {
+  background-color: #0b3d91;
+  color: white;
+  border-bottom: none;
+  border-radius: 12px 12px 0 0;
+}
+
+.modal-title {
+  font-weight: 700;
+}
+
+.modal-footer {
+  border-top: none;
+  justify-content: flex-end;
+}
+
+/* Buttons */
+
+.btn-primary {
+  background-color: #0b3d91;
+  border-color: #0b3d91;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+  background-color: #064273;
+  border-color: #064273;
+}
+
+/* Responsive tweaks */
+
+@media (max-width: 900px) {
+  .stats-panel {
+    max-width: 100%;
+    margin: 1.5rem 0 0 0;
+  }
+
+  .pagination {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}
+
+
+/* Verified/Unverified badges */
+.verified-badge {
+  display: inline-block;
+  padding: 0.3rem 0.75rem;
+  background-color: #28a745;
+  color: #fff;
+  border-radius: 20px;
+  font-weight: bold;
+  font-size: 0.9rem;
+  animation: pulse-green 1.5s infinite;
+}
+
+.unverified-badge {
+  display: inline-block;
+  padding: 0.3rem 0.75rem;
+  background-color: #dc3545;
+  color: #fff;
+  border-radius: 20px;
+  font-weight: bold;
+  font-size: 0.9rem;
+  animation: pulse-red 1.5s infinite;
+}
+
+/* Subtle pulsing animation */
+@keyframes pulse-green {
+  0% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(40, 167, 69, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0); }
+}
+
+@keyframes pulse-red {
+  0% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.4); }
+  70% { box-shadow: 0 0 0 10px rgba(220, 53, 69, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0); }
+}
+
+
+.hospital-table {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  font-size: 0.95rem;
+  box-shadow: 0 8px 24px rgba(15, 33, 55, 0.1);
+  transition: all 0.3s ease;
+}
+
+.table-header th {
+  font-weight: 600;
+  font-size: 1rem;
+  letter-spacing: 0.5px;
+  background-color: #0b3d91 !important;
+  color: white !important;
+  vertical-align: middle;
+  border-bottom: 2px solid #ccc;
+}
+
+.hospital-row {
+  transition: background-color 0.25s ease;
+}
+
+.hospital-row:hover {
+  background-color: #f0f7ff;
+}
+
+.profile-img {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #0b3d91;
+}
+
+.profile-placeholder {
+  width: 42px;
+  height: 42px;
+  background-color: #6c757d;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 1.1rem;
+  border: 2px solid #0b3d91;
+  user-select: none;
+}
+
+.verified-badge,
+.unverified-badge {
+  display: inline-flex;
+  align-items: center;
+  font-weight: 600;
+  padding: 0.25rem 0.6rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  background-color: rgba(40, 167, 69, 0.1);
+}
+
+.unverified-badge {
+  background-color: rgba(220, 53, 69, 0.1);
+}
+
+.icon {
+  vertical-align: middle;
+  font-size: 1rem;
+}
+
+button.btn-outline-success,
+button.btn-outline-danger {
+  transition: all 0.2s ease;
+}
+
+button.btn-outline-success:hover {
+  background-color: #28a745;
+  color: white;
+}
+
+button.btn-outline-danger:hover {
+  background-color: #dc3545;
+  color: white;
+}
+
+/* Minimized action buttons in hospital table */
+.action-btn {
+  padding: 2px 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  height: 30px;
+  width: 30px;
+}
+
+.action-btn svg {
+  margin: 0;
+  padding: 0;
+}
+
+td.d-flex {
+  align-items: center;
+}
+

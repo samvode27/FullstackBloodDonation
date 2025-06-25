@@ -2,9 +2,9 @@ import { createSlice } from '@reduxjs/toolkit'
 
 const donorSlice = createSlice({
    name: "donor",
-   
+
    initialState: {
-      donorcurrentUser: null,
+      currentUser: null,
       isFetching: false,
       error: false
    },
@@ -20,15 +20,20 @@ const donorSlice = createSlice({
       },
       loginfailure: (state) => {
          state.isFetching = false,
-         state.error = true;
+            state.error = true;
       },
       logout: (state) => {
          state.isFetching = false,
-         state.currentUser = null;
+            state.currentUser = null;
+         state.error = false;
+      },
+      updateDonorSuccess: (state, action) => {
+         state.currentUser = action.payload;
+         state.isFetching = false;
          state.error = false;
       }
    }
 })
 
-export const {loginstart, loginsuccess, loginfailure, logout} = donorSlice.actions;
+export const { loginstart, loginsuccess, loginfailure, logout, updateDonorSuccess  } = donorSlice.actions;
 export default donorSlice.reducer;

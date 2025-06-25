@@ -1,87 +1,127 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import '../App.css';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { logout } from '../redux/adminRedux';
 import {
-  FaBox,
-  FaCalendarAlt,
-  FaChartBar,
-  FaClipboard,
-  FaCog,
-  FaElementor,
-  FaHdd,
-  FaHome,
-  FaUser,
-  FaUsers,
-  FaTint
-} from "react-icons/fa";
-import { MdLocalHospital } from "react-icons/md";
+  BsPersonCircle,
+  BsJustify,
+  BsCart3,
+  BsGrid1X2Fill,
+  BsFillGrid3X3GapFill,
+  BsPeopleFill,
+  BsListCheck,
+  BsMoonFill,
+  BsSunFill
+} from 'react-icons/bs';
 
-const Menu = () => {
-  const [activeLink, setActiveLink] = useState("/admin");
+const Header = ({ OpenSidebar, isDark, toggleDarkMode }) => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-  const handleActiveLink = (link) => {
-    setActiveLink(link);
+  const handleLogout = () => {
+    dispatch(logout());
+    navigate('/');
   };
 
-  const getLinkClasses = (link) => 
-    `list-group-item list-group-item-action d-flex align-items-center gap-2 ${
-      activeLink === link ? "active bg-danger text-white border-danger" : ""
-    }`;
+  return (
+    <header className='header'>
+      <div className='menu-icon' title="Toggle Sidebar">
+        <BsJustify className='icon' onClick={OpenSidebar} />
+      </div>
+
+      <div className='header-right'>
+        <span
+          style={{ marginTop: "-1px" }}
+          className='icon theme-toggle'
+          onClick={toggleDarkMode}
+          title="Toggle Theme"
+        >
+          {isDark ? <BsSunFill /> : <BsMoonFill />}
+        </span>
+
+        <div className="profile-menu" tabIndex={0} aria-label="User Profile Menu">
+          <BsPersonCircle className='icon profile-icon' title="User" />
+          <div className="profile-dropdown">
+            <span>👤 Profile</span>
+            <span onClick={handleLogout}>🔒 Logout</span>
+          </div>
+        </div>
+      </div>
+    </header>
+  );
+};
+
+const Sidebar = ({ openSidebarToggle, OpenSidebar, pathname }) => {
+  const menuItems = [
+    { icon: <BsGrid1X2Fill />, label: 'Dashboard', path: '/admin' },
+    { icon: <BsPeopleFill />, label: 'Donors', path: '/admin/donors' },
+    { icon: <BsFillGrid3X3GapFill />, label: 'Hospitals', path: '/admin/hospitals' },
+    { icon: <BsListCheck />, label: 'Requests', path: '/admin/requests' },
+  ];
 
   return (
-    <div className="bg-light p-3" style={{ width: '280px', height: '110vh' }}>
-      <div className="list-group">
-
-        <Link to="/admin" onClick={() => handleActiveLink("/admin")} className={getLinkClasses("/admin")}>
-          <FaHome /> Home
-        </Link>
-
-        <div className="list-group-item d-flex align-items-center gap-2">
-          <FaUser className="text-danger" /> Profile
+    <aside id="sidebar" className={`${openSidebarToggle ? 'sidebar-responsive' : ''} sidebar`}>
+      <div className='sidebar-title'>
+        <div className='sidebar-brand'>
+          <BsCart3 className='icon_header' />
+          <span className='brand-text'>Admin</span>
         </div>
-
-        <hr />
-
-        <Link to="/admin/donors" onClick={() => handleActiveLink("/admin/donors")} className={getLinkClasses("/admin/donors")}>
-          <FaTint /> Donors
-        </Link>
-
-        <Link to="/admin/prospects" onClick={() => handleActiveLink("/admin/prospects")} className={getLinkClasses("/admin/prospects")}>
-          <FaUsers /> Prospects
-        </Link>
-
-        <Link to="/admin/hospitals" onClick={() => handleActiveLink("/admin/hospitals")} className={getLinkClasses("/admin/hospitals")}>
-          <MdLocalHospital /> Hospitals
-        </Link>
-
-        <hr />
-
-        <div className="list-group-item d-flex align-items-center gap-2">
-          <FaElementor className="text-danger" /> Elements
-        </div>
-
-        <div className="list-group-item d-flex align-items-center gap-2">
-          <FaCog className="text-danger" /> Settings
-        </div>
-
-        <div className="list-group-item d-flex align-items-center gap-2">
-          <FaHdd className="text-danger" /> Backups
-        </div>
-
-        <hr />
-
-        <div className="list-group-item d-flex align-items-center gap-2">
-          <FaChartBar className="text-danger" /> Charts
-        </div>
-
-        <div className="list-group-item d-flex align-items-center gap-2">
-          <FaClipboard className="text-danger" /> All logs
-        </div>
-
-        <div className="list-group-item d-flex align-items-center gap-2">
-          <FaCalendarAlt className="text-danger" /> Calendar
-        </div>
-
+        <span className='icon close_icon' onClick={OpenSidebar}>×</span>
       </div>
+
+      <ul className='sidebar-list'>
+        {menuItems.map((item, i) => (
+          <li
+            key={i}
+            className={`sidebar-list-item ${pathname === item.path ? 'active-menu' : ''}`}
+          >
+            <a href={item.path} className="menu-item" title={item.label}>
+              {item.icon}
+              <span className="menu-label">{item.label}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </aside>
+  );
+};
+
+const Menu = () => {
+  const [openSidebarToggle, setOpenSidebarToggle] = useState(window.innerWidth >= 768);
+  const [isDark, setIsDark] = useState(false);
+  const location = useLocation();
+
+  const OpenSidebar = () => setOpenSidebarToggle(prev => !prev);
+  const toggleDarkMode = () => {
+    document.body.classList.toggle('dark');
+    setIsDark(prev => !prev);
+  };
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 768) setOpenSidebarToggle(false);
+      else setOpenSidebarToggle(true);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  useEffect(() => {
+    document.body.classList.toggle('dark', isDark);
+  }, [isDark]);
+
+  return (
+    <div className='grid-container'>
+      <Header OpenSidebar={OpenSidebar} isDark={isDark} toggleDarkMode={toggleDarkMode} />
+      <Sidebar
+        openSidebarToggle={openSidebarToggle}
+        OpenSidebar={OpenSidebar}
+        pathname={location.pathname}
+      />
+      <main className='main-container'>
+        <Outlet />
+      </main>
     </div>
   );
 };
