@@ -1,0 +1,170 @@
+/* Base Light Mode (your existing styles with minor improvements) */
+
+:root {
+  --bg-light: #f9f9f9;
+  --text-light: #1f1f1f;
+  --card-bg: #fff;
+  --card-shadow: rgba(0, 0, 0, 0.1);
+  --donor-card-bg: #f8f9fa;
+  --border-color: #dee2e6;
+}
+
+.dashboard {
+  padding: 2rem;
+  background: var(--bg-light);
+  color: var(--text-light);
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+.dashboard-title {
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  font-weight: 700;
+}
+
+.summary-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.card {
+  padding: 1rem;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  box-shadow: 0 2px 12px var(--card-shadow);
+  background: var(--card-bg);
+  cursor: default;
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+.card:hover {
+  box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+  transform: translateY(-4px);
+}
+
+.charts-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.chart-box {
+  background: var(--card-bg);
+  padding: 1rem;
+  border-radius: 12px;
+  box-shadow: 0 1px 10px rgba(0, 0, 0, 0.05);
+  transition: background 0.3s ease;
+}
+
+.top-donors {
+  margin-top: 2rem;
+}
+
+.donor-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 1rem;
+}
+
+.donor-card {
+  background: var(--donor-card-bg);
+  border-radius: 12px;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.08);
+  cursor: default;
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+.donor-card:hover {
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+  transform: translateY(-5px);
+}
+
+.donor-img {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--border-color);
+}
+
+.badge-gold,
+.badge-silver,
+.badge-bronze {
+  padding: 2px 8px;
+  border-radius: 6px;
+  color: #000;
+  font-weight: 600;
+  animation: bounce 2s infinite ease-in-out;
+  user-select: none;
+}
+
+.badge-gold {
+  background: gold;
+  color: #000;
+}
+.badge-silver {
+  background: silver;
+  color: #000;
+}
+.badge-bronze {
+  background: #cd7f32;
+  color: #fff;
+}
+
+/* Bounce animation for badges */
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+/* Responsive tweaks */
+@media (max-width: 768px) {
+  .charts-container {
+    grid-template-columns: 1fr;
+  }
+  .summary-cards {
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  }
+  .donor-grid {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  }
+}
+
+/* === DARK MODE === */
+
+.dark {
+  --bg-light: #121212;
+  --text-light: #e4e4e4;
+  --card-bg: #1e1e1e;
+  --card-shadow: rgba(255, 255, 255, 0.1);
+  --donor-card-bg: #2a2a2a;
+  --border-color: #555;
+}
+
+.dark .dashboard {
+  background: var(--bg-light);
+  color: var(--text-light);
+}
+
+.dark .card,
+.dark .chart-box,
+.dark .donor-card {
+  background: var(--card-bg);
+  box-shadow: 0 2px 12px var(--card-shadow);
+}
+
+.dark .donor-img {
+  border-color: var(--border-color);
+}
+
+/* Adjust badge text color for bronze in dark */
+.dark .badge-bronze {
+  color: #eee;
+}

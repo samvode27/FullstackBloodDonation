@@ -1,8 +1,10 @@
+// DonorForgot.jsx - Enhanced with Bootstrap & external CSS
 import React, { useState } from 'react';
 import { donorSendForgotPasswordCode, donorVerifyForgotPasswordCode } from '../redux/apiCalls';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from 'react-router-dom';
+import './DonorForgot.css';
 
 const DonorForgot = () => {
   const [email, setEmail] = useState('');
@@ -29,7 +31,7 @@ const DonorForgot = () => {
         email: email,
         providedCode: code,
         newPassword: newPassword
-       });
+      });
       toast.success('Password updated successfully.');
       setTimeout(() => {
         navigate('/donorlogin');
@@ -40,12 +42,12 @@ const DonorForgot = () => {
   };
 
   return (
-    <div className="container d-flex justify-content-center align-items-center min-vh-100">
+    <div className="forgot-wrapper d-flex justify-content-center align-items-center">
       <ToastContainer position="top-center" />
-      <div className="card p-4 shadow" style={{ maxWidth: '500px', width: '100%' }}>
-        <h3 className="text-center mb-4">Donor Forgot Password</h3>
+      <div className="forgot-card card p-4 shadow">
+        <h3 className="text-center text-danger mb-4">Donor Forgot Password</h3>
         <form onSubmit={codeSent ? handleVerifyCode : handleSendCode}>
-          <div className="mb-3">
+          <div className="form-group mb-3">
             <label htmlFor="email" className="form-label">Email address</label>
             <input
               type="email"
@@ -59,7 +61,7 @@ const DonorForgot = () => {
 
           {codeSent && (
             <>
-              <div className="mb-3">
+              <div className="form-group mb-3">
                 <label htmlFor="code" className="form-label">Verification Code</label>
                 <input
                   type="text"
@@ -70,7 +72,7 @@ const DonorForgot = () => {
                   onChange={(e) => setCode(e.target.value)}
                 />
               </div>
-              <div className="mb-3">
+              <div className="form-group mb-3">
                 <label htmlFor="newPassword" className="form-label">New Password</label>
                 <input
                   type="password"

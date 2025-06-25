@@ -22,7 +22,7 @@ export const Donorlogin = async (dispatch, user) => {
   try {
     const res = await publicRequest.post("/donors/signin", user);
     console.log(res.data);
-    dispatch(donorSuccess(res.data));
+    dispatch(donorSuccess(res.data.user));
   } catch (error) {
     dispatch(donorFailure());
   }
@@ -34,10 +34,16 @@ export const Hospitallogin = async (dispatch, user) => {
   try {
     const res = await publicRequest.post("/hospitals/signin", user);
     console.log(res.data);
-    dispatch(hospitalSuccess(res.data));
+    dispatch(hospitalSuccess(res.data.user));
   } catch (error) {
     dispatch(hospitalFailure());
   }
+};
+
+export const hospitalChangePassword = async (data) => {
+  return await publicRequest.patch("/hospitals/changepassword", data, {
+    withCredentials: true,  // <-- Needed so the cookie (token) is sent!
+  });
 };
 
 export const donorSendForgotPasswordCode = async (email) => {
@@ -81,5 +87,22 @@ export const hospitalVerifyForgotPasswordCode = async (data) => {
 };
 
 
+export const sendBloodRequest = async (data, token) => {
+  try {
+    const res = await publicRequest.post("/bloodrequest",
+      data,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`, // Use the passed token
+        },
+      }
+    );
+    console.log("Blood request sent:", res.data);
+    return res.data;
+  } catch (err) {
+    console.error("Blood request error:", err);
+    throw err;
+  }
+};
 
 

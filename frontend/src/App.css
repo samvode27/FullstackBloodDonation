@@ -1,0 +1,378 @@
+/* ===== Root Variables for Light & Dark Themes ===== */
+:root {
+  --bg-light: #ffffff;
+  --bg-dark: #1f1f1f;
+  --text-light: #1f1f1f;
+  --text-dark: #f1f1f1;
+  --sidebar-width: 250px;
+}
+
+/* ===== Reset ===== */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: var(--bg-light);
+  color: var(--text-light);
+  transition: background-color 0.3s, color 0.3s;
+}
+
+/* ===== Dark Mode ===== */
+body.dark {
+  background-color: var(--bg-dark);
+  color: var(--text-dark);
+}
+
+/* ===== Grid Layout ===== */
+.grid-container {
+  display: grid;
+  grid-template-columns: var(--sidebar-width) 1fr;
+  grid-template-rows: 60px auto;
+  grid-template-areas:
+    "sidebar header"
+    "sidebar main";
+  min-height: 100vh;
+}
+
+.header {
+  grid-area: header;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid #ddd;
+  position: sticky;
+  top: 0;
+  z-index: 999;
+  transition: all 0.3s ease;
+}
+
+body.dark .header {
+  background: rgba(30, 30, 30, 0.8);
+  border-bottom: 1px solid #444;
+}
+
+.menu-icon {
+  cursor: pointer;
+}
+
+.icon {
+  font-size: 24px;
+  color: inherit;
+  transition: transform 0.3s;
+}
+
+/* Search Bar */
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #f0f0f0;
+  padding: 6px 12px;
+  border-radius: 8px;
+  max-width: 300px;
+  flex-grow: 1;
+  margin: 0 20px;
+}
+
+.search-bar input {
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 14px;
+  width: 100%;
+  color: #333;
+}
+
+body.dark .search-bar {
+  background-color: #2a2a2a;
+}
+
+body.dark .search-bar input {
+  color: #fff;
+}
+
+/* Header Right - Icons & Profile */
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  position: relative;
+}
+
+/* Icon wrapper for notification & messages */
+.icon-badge-wrapper {
+  position: relative;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.icon-badge-wrapper .icon {
+  font-size: 1.5rem;
+  color: #555;
+  transition: color 0.3s;
+}
+
+.icon-badge-wrapper:hover .icon {
+  color: #0d6efd; /* bootstrap primary blue */
+}
+
+/* Badge circle */
+.badge {
+  top: -6px;
+  right: -8px;
+  background-color: #dc3545; /* bootstrap danger red */
+  color: white;
+  font-size: 0.7rem;
+  font-weight: bold;
+  padding: 0 6px;
+  border-radius: 12px;
+  user-select: none;
+}
+
+/* Profile menu */
+.profile-menu {
+  position: relative;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.profile-icon {
+  font-size: 1.7rem;
+  color: #555;
+  transition: color 0.3s;
+}
+
+.profile-menu:hover .profile-icon,
+.profile-menu:focus-within .profile-icon {
+  color: #0d6efd;
+}
+
+/* Dropdown hidden by default */
+.profile-dropdown {
+  display: none;
+  position: absolute;
+  top: 130%; /* below the icon */
+  right: 0;
+  background: white;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  white-space: nowrap;
+  z-index: 10;
+  min-width: 120px;
+  flex-direction: column;
+}
+
+/* Show dropdown on hover or focus */
+.profile-menu:hover .profile-dropdown,
+.profile-menu:focus-within .profile-dropdown {
+  display: flex;
+}
+
+.profile-dropdown span {
+  display: block;
+  padding: 0.25rem 0;
+  cursor: pointer;
+  color: #333;
+  font-size: 0.9rem;
+}
+
+.profile-dropdown span:hover {
+  background-color: #f0f0f0;
+}
+
+body.dark .profile-dropdown {
+  background-color: #333;
+  color: #fff;
+}
+
+body.dark .profile-dropdown span:hover {
+  background-color: #444;
+}
+
+/* Theme toggle icon */
+.theme-toggle {
+  cursor: pointer;
+  font-size: 1.5rem;
+  color: #555;
+  transition: color 0.3s;
+}
+
+.theme-toggle:hover {
+  color: #0d6efd;
+}
+
+/* Logout button */
+.btn-outline-danger {
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0.5rem;
+  border-color: #dc3545;
+  color: #dc3545;
+  background: transparent;
+  border-radius: 4px;
+  transition: background-color 0.3s, color 0.3s;
+  cursor: pointer;
+}
+
+.btn-outline-danger:hover {
+  background-color: #dc3545;
+  color: white;
+}
+
+/* Sidebar styles */
+.sidebar {
+  grid-area: sidebar;
+  background-color: #1d2634;
+  color: #fff;
+  padding: 20px 0;
+  position: relative;
+  transition: transform 0.3s ease;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.sidebar-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sidebar-list {
+  list-style: none;
+  padding: 0;
+  margin-top: 40px;
+}
+
+.sidebar-list-item {
+  padding: 20px 20px;
+}
+
+.sidebar-list-item .menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: #9e9ea4;
+  transition: color 0.2s;
+}
+
+.sidebar-list-item .menu-item:hover,
+.sidebar-list-item.active-menu .menu-item {
+  color: #fff;
+}
+
+.sidebar-list-item:hover {
+  background-color: #3a3f51;
+  border-left: 4px solid #ff4757;
+}
+
+/* Sidebar close icon */
+.close_icon {
+  cursor: pointer;
+  font-size: 2rem;
+  color: #fff;
+  user-select: none;
+}
+
+/* Main content */
+.main-container {
+  grid-area: main;
+  padding: 20px;
+  background-color: #f9f9f9;
+  transition: background-color 0.3s;
+  overflow-y: auto;
+}
+
+body.dark .main-container {
+  background-color: #121212;
+}
+
+/* Responsive Sidebar */
+@media (max-width: 768px) {
+  .grid-container {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "header"
+      "main";
+  }
+
+  .sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: var(--sidebar-width);
+    height: 100vh;
+    background-color: #1d2634;
+    transform: translateX(-100%);
+    z-index: 1000;
+  }
+
+  .sidebar.sidebar-responsive {
+    transform: translateX(0);
+  }
+
+  .menu-label,
+  .brand-text {
+    display: none;
+  }
+
+  .main-container {
+    padding: 10px;
+  }
+}
+
+
+/* Sidebar collapse behavior */
+.sidebar.collapsed {
+  width: 60px;
+  transition: width 0.3s ease;
+}
+
+.sidebar.collapsed .menu-label,
+.sidebar.collapsed .brand-text {
+  display: none;
+}
+
+.grid-container.sidebar-collapsed {
+  grid-template-columns: 60px 1fr;
+}
+
+.sidebar {
+  width: var(--sidebar-width);
+  transition: width 0.3s ease;
+}
+
+.sidebar-list-item {
+  display: flex;
+  align-items: center;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Ensure icons are always visible */
+.sidebar .menu-item svg {
+  min-width: 20px;
+  height: 20px;
+}
+

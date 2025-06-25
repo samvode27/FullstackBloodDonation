@@ -64,3 +64,36 @@
 .badge-blood-ABminus { background-color: #0d6efd; }
 .badge-blood-Oplus { background-color: #212529; }
 .badge-blood-Ominus { background-color: #f8f9fa; color: #000; } 
+
+
+
+.profile-edit {
+  padding: 2rem;
+  max-width: 500px;
+  margin: auto;
+}
+
+.profile-form input {
+  display: block;
+  width: 100%;
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding: 2rem;
+}
+.profile-view, .donation-form, .top-donors, .donor-card {
+  border: 1px solid #ddd;
+  padding: 1rem;
+  border-radius: 8px;
+}
+.donor-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}

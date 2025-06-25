@@ -1,0 +1,328 @@
+.donor-card {
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+}
+
+.badge-rank {
+  top: -10px;
+  right: -10px;
+  background-color: #dc3545; /* Bootstrap danger */
+  color: white;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.donation-badge {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #d6336c; /* Slight pink/red */
+}
+
+.rating-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  font-weight: 600;
+}
+
+.star-rating {
+  font-size: 1rem;
+  letter-spacing: 0.05em;
+}
+
+.medal {
+  font-size: 0.9rem;
+  padding: 2px 8px;
+  border-radius: 12px;
+  color: white;
+  width: fit-content;
+  user-select: none;
+  transition: background-color 0.3s ease;
+}
+
+.medal-gold {
+  background-color: #ffd700;
+  color: #333;
+  box-shadow: 0 0 8px #ffd700aa;
+}
+
+.medal-silver {
+  background-color: #c0c0c0;
+  color: #222;
+  box-shadow: 0 0 8px #c0c0c0aa;
+}
+
+.medal-bronze {
+  background-color: #cd7f32;
+  color: white;
+  box-shadow: 0 0 8px #cd7f32aa;
+}
+
+.verified-label {
+  margin-top: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+
+
+/* donation status section */
+
+.donor-status-panel {
+  background: rgba(255, 255, 255, 0.8);
+  border-left: 5px solid #dc3545;
+  transition: box-shadow 0.3s;
+}
+
+.donor-status-panel:hover {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.eligibility-list li {
+  margin-bottom: 0.75rem;
+  font-size: 0.95rem;
+}
+
+.pulse-btn {
+  animation: pulse 1.5s infinite;
+}
+.eligibility-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 0.95rem;
+}
+
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(40, 167, 69, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(40, 167, 69, 0);
+  }
+}
+
+
+/* chart */
+.chart-container {
+  height: 320px;
+  padding: 1rem;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 12px;
+  transition: box-shadow 0.3s ease-in-out;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.chart-container:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.chart-container canvas {
+  border-radius: 12px;
+}
+
+/* Tooltip customization (works if you want a more modern white theme) */
+.chartjs-tooltip {
+  background: #fff !important;
+  border: 1px solid #ccc !important;
+  color: #333 !important;
+  border-radius: 6px !important;
+  padding: 0.5rem !important;
+  font-size: 0.9rem;
+}
+/* button */
+@keyframes pulse-pop {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 rgba(72, 187, 120, 0.6);
+  }
+  50% {
+    transform: scale(1.03);
+    box-shadow: 0 0 10px rgba(72, 187, 120, 0.4);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 rgba(72, 187, 120, 0);
+  }
+}
+
+.animate-donate-btn:hover {
+  animation: pulse-pop 0.4s ease-in-out forwards;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* styles */
+.pulse-step {
+  animation: pulse-ring 2s infinite;
+}
+
+@keyframes pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(220, 53, 69, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(220, 53, 69, 0);
+  }
+}
+
+/* GLOBAL DARK MODE */
+.dark-mode {
+  background-color: #121212;
+  color: #f0f0f0;
+}
+
+/* GENERAL TEXT AND ICON COLORS */
+.dark-mode h1,
+.dark-mode h2,
+.dark-mode h3,
+.dark-mode h4,
+.dark-mode h5,
+.dark-mode h6,
+.dark-mode p,
+.dark-mode span,
+.dark-mode div,
+.dark-mode li,
+.dark-mode label,
+.dark-mode small,
+.dark-mode .text-muted,
+.dark-mode .faq-answer,
+.dark-mode .faq-question {
+  color: #f0f0f0 !important;
+}
+
+/* ICONS */
+.dark-mode svg {
+  color: #ffffff !important;
+  fill: #ffffff !important;
+}
+
+/* COMPONENT STYLING */
+.dark-mode .card,
+.dark-mode .modal-content,
+.dark-mode .form-control,
+.dark-mode .btn,
+.dark-mode .donor-status-panel,
+.dark-mode .profile-card,
+.dark-mode .faq-question,
+.dark-mode .faq-answer,
+.dark-mode .bar-chart,
+.dark-mode .bg-white,
+.dark-mode .bg-light {
+  background-color: #1f1f1f !important;
+  color: #f0f0f0 !important;
+  border-color: #444 !important;
+}
+
+/* BUTTONS */
+.dark-mode .btn-outline-primary {
+  color: #90caf9;
+  border-color: #90caf9;
+}
+.dark-mode .btn-outline-primary:hover {
+  background-color: #90caf9;
+  color: #000;
+}
+.dark-mode .btn-danger {
+  background-color: #e57373;
+  border-color: #e57373;
+}
+.dark-mode .btn-outline-secondary {
+  color: #bdbdbd;
+  border-color: #bdbdbd;
+}
+.dark-mode .btn-outline-secondary:hover {
+  background-color: #bdbdbd;
+  color: #121212;
+}
+
+/* MODAL HEADER TITLE */
+.dark-mode .modal-header .modal-title {
+  color: #ffffff;
+}
+
+/* FAQ ICON COLOR */
+.dark-mode .faq-question svg {
+  color: #ffffff !important;
+}
+
+/* TOAST */
+.dark-mode .Toastify__toast {
+  background-color: #333;
+  color: #fff;
+}
+
+/* QR CODE BORDER */
+.dark-mode .qr-border-green {
+  border-color: #66bb6a !important;
+}
+.dark-mode .qr-border-blue {
+  border-color: #42a5f5 !important;
+}
+.dark-mode .qr-border-yellow {
+  border-color: #fdd835 !important;
+}
+.dark-mode .qr-border-white {
+  border-color: #eeeeee !important;
+}
+
+.dark-mode .pulse-step {
+  background-color: #444 !important;
+}
+
+.dark-mode .pulse-step svg {
+  color: white !important;
+  fill: white !important;
+}
+
+
+.chat-box {
+  display: flex;
+  flex-direction: column;
+}
+
+.donation-history-container {
+  background: var(--bg-color);
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 8px rgb(0 0 0 / 0.1);
+  margin: 1rem 0;
+  overflow: hidden;
+  color: var(--text-color);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.donation-history-container.light {
+  --bg-color: #ffffff;
+  --text-color: #212529;
+  --header-bg: #f8f9fa;
+  --header-text: #495057;
+}
+
+.donation-history-container.dark {
+  --bg-color: #2b2b2b;
+  --text-color: #f0f0f0;
+  --header-bg: #3a3a3a;
+  --header-text: #dcdcdc;
+}
+
+.donation-history-header {
+  background-color: var(--header-bg);
+  color: var(--header-text);
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.donation-history-body {
+  background-color: var(--bg-color);
+}
+

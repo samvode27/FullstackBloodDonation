@@ -19,14 +19,14 @@ const registerAdmin = async (req, res) => {
     const newAdmin = new Admin({
       name: req.body.name,
       email: req.body.email,
-      password: encryptedPassword,  
+      password: encryptedPassword,
     });
 
     const admin = await newAdmin.save();
-    res.status(201).json(admin);                                                                                                 
+    res.status(201).json(admin);
   } catch (error) {
-    res.status(500).json(error);                                                                                                                                                                                      
-  }                                                                                                    
+    res.status(500).json(error);
+  }
 };
 
 
@@ -45,10 +45,6 @@ const loginAdmin = async (req, res) => {
     const decrypted = CryptoJs.AES.decrypt(user.password, process.env.PASS);
     const originalPassword = decrypted.toString(CryptoJs.enc.Utf8);
 
-    console.log("Stored Encrypted:", user.password);
-    console.log("Decrypted from DB:", originalPassword);
-    console.log("Password from client:", req.body.password);
-
     if (originalPassword !== req.body.password) {
       return res.status(401).json({ error: "Wrong password" });
     }
@@ -61,6 +57,12 @@ const loginAdmin = async (req, res) => {
       { expiresIn: "10d" }
     );
 
+    res.cookie("adminToken", accessToken, {
+      httpOnly: true,
+      secure: false, // true in production (with HTTPS)
+      sameSite: "Lax"
+    });
+
     res.status(200).json({ ...info, accessToken });
   } catch (error) {
     console.error("Login error:", error);
@@ -70,38 +72,38 @@ const loginAdmin = async (req, res) => {
 
 
 //Create Admin
-const createAdmin = async(req, res) => {
-   try {
-      const newAdmin = Admin(req.body);
-      const admin = await newAdmin.save();
-      res.status(201).json(admin);                                                                                                 
-   } catch (error) {
-      res.status(500).json(error);                                                                                                                                                                                      
-   }                                                                                                    
+const createAdmin = async (req, res) => {
+  try {
+    const newAdmin = Admin(req.body);
+    const admin = await newAdmin.save();
+    res.status(201).json(admin);
+  } catch (error) {
+    res.status(500).json(error);
+  }
 }
 
 //Update admin
 const updateAdmin = async (req, res) => {
-   try {
-      const updateAdmin = await Admin.findByIdAndUpdate(
-         req.params.id,
-         { $set: req.body },
-         { new: true }                                                                                              
-      )    
-      res.status(201).json(updateAdmin)                                                                                                                                                                                              
-   } catch (error) {
-      res.status(500).json(error)                                                                                                                                                                                              
-   }                                                                                                     
+  try {
+    const updateAdmin = await Admin.findByIdAndUpdate(
+      req.params.id,
+      { $set: req.body },
+      { new: true }
+    )
+    res.status(201).json(updateAdmin)
+  } catch (error) {
+    res.status(500).json(error)
+  }
 }
 
 //delete admin
 const deleteAdmin = async (req, res) => {
-   try {
-      await Admin.findByIdAndDelete(req.params.id); 
-      res.status(201).json("Admin deleted Successfully");                                                                                                 
-   } catch (error) {
-      res.status(500).json(error)                                                                                                   
-   }                                                                                                    
+  try {
+    await Admin.findByIdAndDelete(req.params.id);
+    res.status(201).json("Admin deleted Successfully");
+  } catch (error) {
+    res.status(500).json(error)
+  }
 }
 
-module.exports = {loginAdmin, registerAdmin, createAdmin, updateAdmin, deleteAdmin}
+module.exports = { loginAdmin, registerAdmin, createAdmin, updateAdmin, deleteAdmin }
