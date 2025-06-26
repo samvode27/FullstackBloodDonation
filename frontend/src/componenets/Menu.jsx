@@ -12,8 +12,17 @@ import {
   BsPeopleFill,
   BsListCheck,
   BsMoonFill,
-  BsSunFill
+  BsSunFill,
+  BsGridFill,           // Dashboard        // Donors
+  BsBuilding,            // Hospitals
+  BsClipboardCheck,
 } from 'react-icons/bs';
+import { MdOutlineEmail } from 'react-icons/md';
+
+import { IoPeopleOutline } from 'react-icons/io5';
+import { FiUsers } from 'react-icons/fi';
+import { MdOutlineMailOutline } from 'react-icons/md';
+
 
 const Header = ({ OpenSidebar, isDark, toggleDarkMode }) => {
   const navigate = useNavigate();
@@ -54,10 +63,12 @@ const Header = ({ OpenSidebar, isDark, toggleDarkMode }) => {
 
 const Sidebar = ({ openSidebarToggle, OpenSidebar, pathname }) => {
   const menuItems = [
-    { icon: <BsGrid1X2Fill />, label: 'Dashboard', path: '/admin' },
+    { icon: <BsGridFill />, label: 'Dashboard', path: '/admin' },
     { icon: <BsPeopleFill />, label: 'Donors', path: '/admin/donors' },
-    { icon: <BsFillGrid3X3GapFill />, label: 'Hospitals', path: '/admin/hospitals' },
-    { icon: <BsListCheck />, label: 'Requests', path: '/admin/requests' },
+    { icon: <BsBuilding />, label: 'Hospitals', path: '/admin/hospitals' },
+    { icon: <BsClipboardCheck />, label: 'Requests', path: '/admin/requests' },
+    { icon: <MdOutlineEmail />, label: 'NewsLetter', path: '/admin/newsletter' },
+    { icon: <MdOutlineEmail />, label: 'Compain', path: '/admin/campaigns' },
   ];
 
   return (

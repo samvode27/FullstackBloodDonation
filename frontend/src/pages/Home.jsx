@@ -1,12 +1,17 @@
 // src/pages/Home.jsx
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import BloodCompatibility from './BloodCompatibility';
 import { useNavigate } from 'react-router-dom';
 import { FaExclamationTriangle, FaTint, FaArrowRight } from 'react-icons/fa';
 import { Tooltip } from 'react-tooltip';
 import './Home.css';
 import Sidebar from '../componenets/Sidebar';
-import { publicRequest } from "../requestMethods";
+import { adminRequest, publicRequest } from "../requestMethods";
+import AOS from 'aos';
+import 'aos/dist/aos.css';
+import bloodImage from '../assets/a.jpg';
+import backgroundImage from '../assets/home.png';
+import { ChevronRightIcon } from '@heroicons/react/24/solid';
 
 const Home = () => {
   const navigate = useNavigate();
@@ -20,6 +25,81 @@ const Home = () => {
     subject: "Comments",
     message: "",
   });
+
+  const [email, setEmail] = useState('');
+  const [msg, setMsg] = useState('');
+  const [error, setError] = useState('');
+  const [campaigns, setCampaigns] = useState([]);
+
+  useEffect(() => {
+    const fetchCampaigns = async () => {
+      try {
+        const res = await adminRequest.get('/campaign');
+        setCampaigns(res.data);
+      } catch (err) {
+        console.error('Failed to load campaigns', err);
+        toast.error('Failed to load campaigns');
+      }
+    };
+    fetchCampaigns();
+  }, []);
+
+  // Duplicate campaigns array for seamless looping animation
+  const duplicatedCampaigns = [...campaigns, ...campaigns];
+  const [expandedIndex, setExpandedIndex] = useState(null);
+  const [selectedCampaign, setSelectedCampaign] = useState(null);
+
+  const containerRef = useRef(null);
+  const contentRef = useRef(null);
+
+  // JavaScript-based horizontal scrolling
+  useEffect(() => {
+    const container = containerRef.current;
+    const content = contentRef.current;
+    let animationFrameId;
+    let speed = 1; // pixels per frame
+    let position = 0;
+
+    const animate = () => {
+      position -= speed;
+      if (position <= -content.scrollWidth / 2) {
+        position = 0;
+      }
+      content.style.transform = `translateX(${position}px)`;
+      animationFrameId = requestAnimationFrame(animate);
+    };
+
+    animationFrameId = requestAnimationFrame(animate);
+
+    container.addEventListener('mouseenter', () => cancelAnimationFrame(animationFrameId));
+    container.addEventListener('mouseleave', () => {
+      animationFrameId = requestAnimationFrame(animate);
+    });
+
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+      container.removeEventListener('mouseenter', () => { });
+      container.removeEventListener('mouseleave', () => { });
+    };
+  }, []);
+
+  // Double the cards for smooth loop
+  const loopedCampaigns = [...duplicatedCampaigns, ...duplicatedCampaigns];
+
+
+  const handleSubscribe = async (e) => {
+    e.preventDefault();
+    setMsg('');
+    setError('');
+
+    try {
+      const res = await publicRequest.post('/newsletter/subscribe', { email });
+      setMsg(res.data.message);
+      setEmail('');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Something went wrong');
+    }
+  };
 
   useEffect(() => {
     const fetchDonorCount = async () => {
@@ -223,20 +303,30 @@ const Home = () => {
     };
   };
 
-  const BloodNeedCard = ({ type, status, urgency, level }) => {
+  const BloodNeedCard = ({ type, status, urgency, level, animation, animationDelay }) => {
     const { card, badge, icon } = getStyles(level);
+
     return (
-      <div className={`p-8 rounded-2xl text-center shadow-lg transition-transform hover:-translate-y-1 ${card}`}>
+      <div
+        className={`p-8 rounded-2xl text-center shadow-lg transition-transform hover:-translate-y-1 ${card}`}
+        data-aos={animation}
+        data-aos-delay={animationDelay}
+        data-aos-duration="800"
+        data-aos-easing="ease-in-out"
+      >
         {icon}
         <div className="text-4xl font-black mb-1 tracking-tight">{type}</div>
         <div className="text-sm font-medium mb-2">{status}</div>
         <div className="mt-1">
-          <span className={`inline-block ${badge} text-white px-3 py-1 rounded-full text-xs font-bold animate-bounce`}>
+          <span
+            className={`inline-block ${badge} text-white px-3 py-1 rounded-full text-xs font-bold animate-bounce`}
+          >
             {urgency}
           </span>
         </div>
-        <button className="mt-4 inline-flex items-center text-sm font-semibold text-white bg-red-500 hover:bg-red-600 px-3 py-1.5 rounded-full shadow-md transition-all"
-          onClick={() => navigate('/donorlogin')}
+        <button
+          className="mt-4 inline-flex items-center text-sm font-semibold text-white bg-red-500 hover:bg-red-600 px-3 py-1.5 rounded-full shadow-md transition-all"
+          onClick={() => navigate("/donorlogin")}
         >
           Donate Now <FaArrowRight className="ml-2" />
         </button>
@@ -263,6 +353,9 @@ const Home = () => {
     }
   };
 
+  useEffect(() => {
+    AOS.init({ duration: 1000, once: true });
+  }, []);
 
   return (
     <>
@@ -333,174 +426,423 @@ const Home = () => {
       </nav >
 
       {/* The remaining sections of the page */}
-      < section id="home" className="relative bg-gradient-to-r from-red-600 to-red-800 text-white py-20" >
-        <div class="absolute inset-0 opacity-20">
-          <div class="absolute inset-0 bg-repeat" style={{ backgroundImage: `url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiPjxkZWZzPjxwYXR0ZXJuIGlkPSJwYXR0ZXJuIiB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHBhdHRlcm5Vbml0cz0idXNlclNwYWNlT25Vc2UiIHBhdHRlcm5UcmFuc2Zvcm09InJvdGF0ZSg0NSkiPjxyZWN0IHdpZHRoPSIyMCIgaGVpZ2h0PSIyMCIgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwwLjA1KSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNwYXR0ZXJuKSIvPjwvc3ZnPg==")`, }}></div>
-        </div>
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div class="flex flex-col md:flex-row items-center">
-            <div class="md:w-1/2 mb-10 md:mb-0">
-              <h1 class="text-4xl md:text-5xl font-bold mb-6 leading-tight">Every Drop Counts <span class="blood-drop">💉</span> Save a Life Today</h1>
-              <p class="text-xl mb-8">EthioLife connects blood donors with recipients across Ethiopia. Join our network of lifesavers and help bridge the gap between blood supply and demand.</p>
-              <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 items-center justify-center mt-6">
+      <section
+        id="home"
+        className="relative text-white py-20"
+        style={{
+          backgroundImage: `linear-gradient(rgba(139, 0, 0, 0.6), rgba(139, 0, 0, 0.6)),
+            url('https://images.unsplash.com/photo-1496346651079-6ca5cb67f42f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1470&q=80')
+           `,
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          backgroundSize: 'cover',
+        }}
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="flex flex-col md:flex-row items-center">
+            {/* Left Text Content */}
+            <div
+              className="md:w-1/2 mb-10 md:mb-0"
+              data-aos="fade-right"
+              data-aos-duration="1000"
+              data-aos-easing="ease-in-out"
+            >
+              <h1
+                className="text-4xl md:text-5xl font-bold mb-6 leading-tight"
+                data-aos="zoom-in"
+                data-aos-delay="300"
+              >
+                Every Drop Counts <span className="blood-drop">💉</span> Save a Life Today
+              </h1>
+              <p className="text-xl mb-8" data-aos="fade-up" data-aos-delay="400">
+                EthioLife connects blood donors with recipients across Ethiopia. Join our
+                network of lifesavers and help bridge the gap between blood supply and demand.
+              </p>
+
+              <div
+                className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 items-center justify-center mt-6"
+                data-aos="fade-up"
+                data-aos-delay="600"
+              >
                 <button
                   className="flex items-center justify-center gap-2 bg-white text-red-600 px-6 py-3 rounded-full font-bold shadow-md hover:bg-gray-100 hover:shadow-lg transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-red-400"
                   onClick={() => navigate('/donorlogin')}
+                  data-aos="zoom-in"
+                  data-aos-delay="700"
                 >
                   <i className="fas fa-heart animate-pulse text-red-500"></i>
                   Become a Donor
                 </button>
 
                 <button
-                  className="flex items-center justify-center gap-2 border-2 border-white text-white px-6 py-3 rounded-full font-bold shadow-md hover:text-black-600 hover:shadow-lg transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white"
+                  className="flex items-center justify-center gap-2 border-2 border-white text-white px-6 py-3 rounded-full font-bold shadow-md hover:text-red-600 hover:shadow-lg transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white"
                   onClick={() => navigate('/findblood')}
+                  data-aos="zoom-in"
+                  data-aos-delay="800"
                 >
                   <i className="fas fa-search animate-bounce"></i>
                   Find Blood Now
                 </button>
               </div>
             </div>
-            <div class="md:w-1/2 flex justify-center">
-              <div class="relative">
-                <div class="bg-white rounded-full p-4 shadow-xl">
-                  <img src="https://images.unsplash.com/photo-1579684385127-1ef15d508118?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=880&q=80" alt="Blood donation" className="w-80 h-80 object-cover rounded-full border-4 border-red-200" />
+
+            {/* Right Image Content */}
+            <div
+              className="md:w-1/2 flex justify-center"
+              data-aos="fade-left"
+              data-aos-duration="1000"
+              data-aos-easing="ease-in-out"
+            >
+              <div className="relative">
+                <div
+                  className="bg-white rounded-full p-4 shadow-xl"
+                  data-aos="zoom-in"
+                  data-aos-delay="1000"
+                >
+                  <img
+                    src="https://images.unsplash.com/photo-1579684385127-1ef15d508118?ixlib=rb-4.0.3&auto=format&fit=crop&w=880&q=80"
+                    alt="Blood donation"
+                    className="w-80 h-80 object-cover rounded-full border-4 border-red-200"
+                  />
                 </div>
-                <div class="absolute -bottom-5 -left-5 bg-red-500 text-white p-4 rounded-full shadow-lg">
-                  <i class="fas fa-tint text-3xl"></i>
+
+                <div
+                  className="absolute -bottom-5 -left-5 bg-red-500 text-white p-4 rounded-full shadow-lg"
+                  data-aos="flip-left"
+                  data-aos-delay="1100"
+                >
+                  <i className="fas fa-tint text-3xl"></i>
                 </div>
-                <div class="absolute -top-5 -right-5 bg-yellow-400 text-white p-4 rounded-full shadow-lg">
-                  <i class="fas fa-heartbeat text-3xl"></i>
+
+                <div
+                  className="absolute -top-5 -right-5 bg-yellow-400 text-white p-4 rounded-full shadow-lg"
+                  data-aos="flip-right"
+                  data-aos-delay="1200"
+                >
+                  <i className="fas fa-heartbeat text-3xl"></i>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </ section >
+      </section>
 
+      {/* data */}
       <section className="py-5 bg-light">
         <div className="container mt-5">
           <div className="row text-center g-4">
+
             {/* Registered Donors */}
-            <div className="col-12 col-md-6 col-lg-3">
-              <div className="card shadow-sm border-0 h-100">
-                <div className="card-body">
-                  <div className="text-danger fs-1 fw-bold" id="donors-counter">
+            <div
+              className="col-12 col-md-6 col-lg-3"
+              data-aos="fade-right"
+              data-aos-delay="100"
+            >
+              <div className="card shadow-sm border-0 h-100 rounded-lg hover:shadow-lg transition-shadow duration-300 hover:scale-[1.05] cursor-pointer relative overflow-hidden bg-white">
+                <div className="absolute inset-0 rounded-lg bg-red-100 opacity-0 hover:opacity-30 transition-opacity duration-500 pointer-events-none"></div>
+                <div className="card-body position-relative">
+                  <div
+                    className="text-danger fs-1 fw-bold"
+                    id="donors-counter"
+                    style={{ fontVariantNumeric: "tabular-nums" }}
+                  >
                     +{donorCount}
                   </div>
-                  <div className="text-muted">
-                    <i className="fas fa-users me-2 text-danger"></i>
-                    Registered Donors
+                  <div className="text-muted d-flex justify-content-center align-items-center gap-2 mt-2 transition-colors duration-300 hover:text-red-600">
+                    <i className="fas fa-users text-danger fs-4 transition-transform duration-300 hover:scale-110"></i>
+                    <span className="font-semibold tracking-wide">Registered Donors</span>
                   </div>
+                </div>
+                <div className="position-absolute bottom-3 end-3 text-red-400 animate-pulse opacity-50">
+                  <i className="fas fa-user-check fs-5"></i>
                 </div>
               </div>
             </div>
 
             {/* Donations This Year */}
-            <div className="col-12 col-md-6 col-lg-3">
-              <div className="card shadow-sm border-0 h-100">
-                <div className="card-body">
-                  <div className="text-danger fs-1 fw-bold" id="donations-counter">
+            <div
+              className="col-12 col-md-6 col-lg-3"
+              data-aos="fade-left"
+              data-aos-delay="200"
+            >
+              <div className="card shadow-sm border-0 h-100 rounded-lg hover:shadow-lg transition-shadow duration-300 hover:scale-[1.05] cursor-pointer relative overflow-hidden bg-white">
+                <div className="absolute inset-0 rounded-lg bg-red-100 opacity-0 hover:opacity-30 transition-opacity duration-500 pointer-events-none"></div>
+                <div className="card-body position-relative">
+                  <div
+                    className="text-danger fs-1 fw-bold"
+                    id="donations-counter"
+                    style={{ fontVariantNumeric: "tabular-nums" }}
+                  >
                     +{donationsThisYear}
                   </div>
-                  <div className="text-muted">
-                    <i className="fas fa-tint me-2 text-danger"></i>
-                    Donations This Year
+                  <div className="text-muted d-flex justify-content-center align-items-center gap-2 mt-2 transition-colors duration-300 hover:text-red-600">
+                    <i className="fas fa-tint text-danger fs-4 transition-transform duration-300 hover:scale-110"></i>
+                    <span className="font-semibold tracking-wide">Donations This Year</span>
                   </div>
+                </div>
+                <div className="position-absolute bottom-3 end-3 text-red-400 animate-pulse opacity-50">
+                  <i className="fas fa-hand-holding-water fs-5"></i>
                 </div>
               </div>
             </div>
 
             {/* Lives Saved */}
-            <div className="col-12 col-md-6 col-lg-3">
-              <div className="card shadow-sm border-0 h-100">
-                <div className="card-body">
-                  <div className="text-danger fs-1 fw-bold" id="lives-counter">
-                    +0 {/* Initial, will be animated */}
+            <div
+              className="col-12 col-md-6 col-lg-3"
+              data-aos="zoom-in"
+              data-aos-delay="300"
+            >
+              <div className="card shadow-sm border-0 h-100 rounded-lg hover:shadow-lg transition-shadow duration-300 hover:scale-[1.05] cursor-pointer relative overflow-hidden bg-white">
+                <div className="absolute inset-0 rounded-lg bg-red-100 opacity-0 hover:opacity-30 transition-opacity duration-500 pointer-events-none"></div>
+                <div className="card-body position-relative">
+                  <div
+                    className="text-danger fs-1 fw-bold"
+                    id="lives-counter"
+                    style={{ fontVariantNumeric: "tabular-nums" }}
+                  >
+                    +0 {/* Will animate */}
                   </div>
-                  <div className="text-muted">
-                    <i className="fas fa-heartbeat me-2 text-danger"></i>Lives Saved
+                  <div className="text-muted d-flex justify-content-center align-items-center gap-2 mt-2 transition-colors duration-300 hover:text-red-600">
+                    <i className="fas fa-heartbeat text-danger fs-4 transition-transform duration-300 hover:scale-110"></i>
+                    <span className="font-semibold tracking-wide">Lives Saved</span>
                   </div>
+                </div>
+                <div className="position-absolute bottom-3 end-3 text-red-400 animate-pulse opacity-50">
+                  <i className="fas fa-lungs fs-5"></i>
                 </div>
               </div>
             </div>
 
             {/* Blood Centers */}
-            <div className="col-12 col-md-6 col-lg-3">
-              <div className="card shadow-sm border-0 h-100">
-                <div className="card-body">
-                  <div className="text-danger fs-1 fw-bold" id="centers-counter">+0</div>
-                  <div className="text-muted">
-                    <i className="fas fa-clinic-medical me-2 text-danger"></i>Blood Centers
+            <div
+              className="col-12 col-md-6 col-lg-3"
+              data-aos="flip-left"
+              data-aos-delay="400"
+            >
+              <div className="card shadow-sm border-0 h-100 rounded-lg hover:shadow-lg transition-shadow duration-300 hover:scale-[1.05] cursor-pointer relative overflow-hidden bg-white">
+                <div className="absolute inset-0 rounded-lg bg-red-100 opacity-0 hover:opacity-30 transition-opacity duration-500 pointer-events-none"></div>
+                <div className="card-body position-relative">
+                  <div
+                    className="text-danger fs-1 fw-bold"
+                    id="centers-counter"
+                    style={{ fontVariantNumeric: "tabular-nums" }}
+                  >
+                    +0
                   </div>
+                  <div className="text-muted d-flex justify-content-center align-items-center gap-2 mt-2 transition-colors duration-300 hover:text-red-600">
+                    <i className="fas fa-clinic-medical text-danger fs-4 transition-transform duration-300 hover:scale-110"></i>
+                    <span className="font-semibold tracking-wide">Blood Centers</span>
+                  </div>
+                </div>
+                <div className="position-absolute bottom-3 end-3 text-red-400 animate-pulse opacity-50">
+                  <i className="fas fa-clinic-medical fs-5"></i>
                 </div>
               </div>
             </div>
+
           </div>
         </div>
       </section>
 
-      <section id="about" className="py-20 bg-gray-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div class="text-center mb-16">
-            <h2 class="text-3xl font-bold text-gray-900 mb-4">Why Blood Donation Matters in Ethiopia</h2>
-            <div class="w-20 h-1 bg-red-600 mx-auto"></div>
-          </div>
-
-          <div class="flex flex-col md:flex-row items-center">
-            <div class="md:w-1/2 mb-10 md:mb-0 md:pr-10">
-              <div class="bg-white p-8 rounded-xl shadow-lg">
-                <p class="text-gray-700 mb-6">Ethiopia faces a chronic blood shortage with only 40% of the required blood supply available annually. Every day, patients in need of blood transfusions face life-threatening situations due to this shortage.</p>
-
-                <div class="space-y-4">
-                  <div class="flex items-start">
-                    <div class="flex-shrink-0 bg-red-100 p-2 rounded-full mr-4">
-                      <i class="fas fa-heart text-red-600"></i>
-                    </div>
-                    <div>
-                      <h4 class="font-bold text-gray-900">Maternal Health</h4>
-                      <p class="text-gray-600">25% of maternal deaths in Ethiopia are related to blood loss during childbirth.</p>
-                    </div>
-                  </div>
-                  <div class="flex items-start">
-                    <div class="flex-shrink-0 bg-red-100 p-2 rounded-full mr-4">
-                      <i class="fas fa-ambulance text-red-600"></i>
-                    </div>
-                    <div>
-                      <h4 class="font-bold text-gray-900">Accidents & Trauma</h4>
-                      <p class="text-gray-600">Road accidents claim thousands of lives annually where blood could save many.</p>
-                    </div>
-                  </div>
-                  <div class="flex items-start">
-                    <div class="flex-shrink-0 bg-red-100 p-2 rounded-full mr-4">
-                      <i class="fas fa-child text-red-600"></i>
-                    </div>
-                    <div>
-                      <h4 class="font-bold text-gray-900">Child Health</h4>
-                      <p class="text-gray-600">Children with severe anemia from malaria often require urgent blood transfusions.</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="md:w-1/2">
-              <div class="relative">
-                <img src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80" alt="Blood donation in Ethiopia" className="rounded-xl shadow-lg w-full h-auto" />
-                <div class="absolute -bottom-5 -right-5 bg-white p-6 rounded-xl shadow-lg">
-                  <div class="text-red-600 text-4xl mb-2">
-                    <i class="fas fa-hands-helping"></i>
-                  </div>
-                  <h4 class="font-bold text-gray-900">Community Impact</h4>
-                  <p class="text-gray-600">Your donation can save up to 3 lives</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section id="donate" className="py-20 bg-white">
+      {/* Why Blood Donation Matters in Ethiopia */}
+      <section id="about" className="py-20 bg-gray-50" data-aos="fade-up">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
+
+          {/* Section Heading */}
+          <div className="text-center mb-16" data-aos="fade-up" data-aos-delay="100">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+              Why Blood Donation Matters in Ethiopia
+            </h2>
+            <div className="w-20 h-1 bg-red-600 mx-auto rounded-full"></div>
+          </div>
+
+          {/* Content Flex Container */}
+          <div className="flex flex-col md:flex-row items-center">
+
+            {/* Left Text Content */}
+            <div className="md:w-1/2 mb-10 md:mb-0 md:pr-10" data-aos="fade-right" data-aos-delay="200">
+              <div className="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
+                <p className="text-gray-700 mb-6">
+                  Ethiopia faces a chronic blood shortage with only 40% of the required blood supply available annually. Every day, patients in need of blood transfusions face life-threatening situations due to this shortage.
+                </p>
+
+                <div className="space-y-4">
+                  <div className="flex items-start">
+                    <div className="flex-shrink-0 bg-red-100 p-2 rounded-full mr-4">
+                      <i className="fas fa-heart text-red-600"></i>
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-gray-900">Maternal Health</h4>
+                      <p className="text-gray-600">
+                        25% of maternal deaths in Ethiopia are related to blood loss during childbirth.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start">
+                    <div className="flex-shrink-0 bg-red-100 p-2 rounded-full mr-4">
+                      <i className="fas fa-ambulance text-red-600"></i>
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-gray-900">Accidents & Trauma</h4>
+                      <p className="text-gray-600">
+                        Road accidents claim thousands of lives annually where blood could save many.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start">
+                    <div className="flex-shrink-0 bg-red-100 p-2 rounded-full mr-4">
+                      <i className="fas fa-child text-red-600"></i>
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-gray-900">Child Health</h4>
+                      <p className="text-gray-600">
+                        Children with severe anemia from malaria often require urgent blood transfusions.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Image Content */}
+            <div className="md:w-1/2" data-aos="fade-left" data-aos-delay="300">
+              <div className="relative group">
+                <img
+                  src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80"
+                  alt="Blood donation in Ethiopia"
+                  className="rounded-xl shadow-lg w-full h-auto transition-transform duration-500 group-hover:scale-105"
+                />
+                <div
+                  className="absolute -bottom-5 -right-5 bg-white p-6 rounded-xl shadow-lg transition-transform duration-300 group-hover:translate-y-[-5px] group-hover:translate-x-[5px]"
+                  data-aos="fade-up"
+                  data-aos-delay="400"
+                >
+                  <div className="text-red-600 text-4xl mb-2">
+                    <i className="fas fa-hands-helping"></i>
+                  </div>
+                  <h4 className="font-bold text-gray-900">Community Impact</h4>
+                  <p className="text-gray-600">Your donation can save up to 3 lives</p>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      <div className="relative overflow-hidden py-8 bg-gray-50" style={{ paddingBottom: "100px" }}>
+        <h2 className="text-3xl font-bold mb-6 text-center text-red-600">
+          Current Blood Donation Campaigns
+        </h2>
+        <div className="w-20 h-1 bg-gray-600 mx-auto rounded-full"></div>
+
+        <div ref={containerRef} className="relative h-[360px] w-full" style={{ marginTop: '100px' }}>
+          <div
+            ref={contentRef}
+            className="absolute top-0 left-0 flex items-center h-full"
+            style={{ willChange: 'transform' }}
+          >
+            {loopedCampaigns.map(({ _id, title, description, date, imageUrl }, index) => (
+              <div
+                key={`${_id}-${index}`}
+                className="flex-shrink-0 mx-4 w-80 bg-white rounded-lg shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl hover:scale-105"
+              >
+                <div className="h-40 overflow-hidden">
+                  {imageUrl ? (
+                    <img
+                      src={`http://localhost:8000/uploads/${imageUrl}`}
+                      alt={title}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-400 italic">
+                      No Image
+                    </div>
+                  )}
+                </div>
+                <div className="p-4">
+                  <h3 className="text-lg font-semibold text-red-700 mb-1">{title}</h3>
+                  <p className="text-gray-600 text-sm">
+                    {description.split(' ').length > 20
+                      ? description.split(' ').slice(0, 30).join(' ') + '...'
+                      : description
+                    }
+                  </p>
+                  {description.split(' ').length > 30 && (
+                    <button
+                      onClick={() =>
+                        setSelectedCampaign({ title, description, date, imageUrl })
+                      }
+                      className="text-red-600 text-xs mt-1 hover:underline"
+                    >
+                      Read more
+                    </button>
+                  )}
+                  <div className="mt-3 flex items-center justify-between">
+                    <span className="text-xs text-gray-500">
+                      {new Date(date).toLocaleDateString()}
+                    </span>
+                    <button
+                      onClick={() => navigate('/donorlogin')}
+                      className="bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-1 rounded-full"
+                    >
+                      Donate Now
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Modal */}
+        {selectedCampaign && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 z-50 overflow-y-auto flex justify-center px-4 py-10">
+            <div className="bg-white rounded-xl shadow-lg max-w-md w-full p-6 relative animate-fadeIn">
+              <button
+                onClick={() => setSelectedCampaign(null)}
+                className="absolute top-2 right-3 text-gray-600 hover:text-red-600 text-xl font-bold"
+              >
+                &times;
+              </button>
+
+              {selectedCampaign.imageUrl ? (
+                <img
+                  src={`http://localhost:8000/uploads/${selectedCampaign.imageUrl}`}
+                  alt={selectedCampaign.title}
+                  className="w-full h-40 object-cover rounded-lg mb-4"
+                />
+              ) : (
+                <div className="w-full h-40 bg-gray-200 rounded-lg flex items-center justify-center text-gray-400 italic mb-4">
+                  No Image
+                </div>
+              )}
+
+              <h3 className="text-xl font-bold text-red-700 mb-2">{selectedCampaign.title}</h3>
+              <p className="text-gray-700 mb-3">{selectedCampaign.description}</p>
+              <p className="text-sm text-gray-500 mb-4">
+                Date: {new Date(selectedCampaign.date).toLocaleDateString()}
+              </p>
+              <button
+                onClick={() => {
+                  setSelectedCampaign(null);
+                  navigate('/donorlogin');
+                }}
+                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-full w-full transition-all"
+              >
+                Donate Now
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Ready to Donate */}
+      <section section id="donate" className="py-20 bg-white" >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16" data-aos="fade-up" data-aos-duration="1000">
             <h2 className="text-4xl sm:text-5xl font-extrabold text-gray-900 mb-4 tracking-tight">
               Ready to <span className="text-red-600">Donate?</span>
             </h2>
@@ -513,7 +855,12 @@ const Home = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
             {/* Step 1 */}
-            <div className="group bg-gray-50 p-8 rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 hover:bg-white">
+            <div
+              className="group bg-gray-50 p-8 rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 hover:bg-white"
+              data-aos="fade-right"
+              data-aos-delay="200"
+              data-aos-duration="800"
+            >
               <div className="text-red-600 text-4xl mb-4 transition-transform duration-300 group-hover:scale-110">
                 <i className="fas fa-clipboard-check"></i>
               </div>
@@ -525,7 +872,12 @@ const Home = () => {
             </div>
 
             {/* Step 2 */}
-            <div className="group bg-gray-50 p-8 rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 hover:bg-white">
+            <div
+              className="group bg-gray-50 p-8 rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 hover:bg-white"
+              data-aos="fade-up"
+              data-aos-delay="400"
+              data-aos-duration="800"
+            >
               <div className="text-red-600 text-4xl mb-4 transition-transform duration-300 group-hover:scale-110">
                 <i className="fas fa-map-marker-alt"></i>
               </div>
@@ -536,7 +888,12 @@ const Home = () => {
             </div>
 
             {/* Step 3 */}
-            <div className="group bg-gray-50 p-8 rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 hover:bg-white">
+            <div
+              className="group bg-gray-50 p-8 rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 hover:bg-white"
+              data-aos="fade-left"
+              data-aos-delay="600"
+              data-aos-duration="800"
+            >
               <div className="text-red-600 text-4xl mb-4 transition-transform duration-300 group-hover:scale-110">
                 <i className="fas fa-heartbeat"></i>
               </div>
@@ -547,14 +904,15 @@ const Home = () => {
             </div>
           </div>
         </div>
-      </section>
+      </section >
 
-      <section className="py-20 bg-gradient-to-br from-gray-50 to-white relative overflow-hidden">
+      {/* compatibility */}
+      <section className="pt-20 pb-1 bg-gradient-to-br from-gray-50 to-white relative overflow-hidden" data-aos="fade-up">
         <div className="absolute top-0 left-0 w-32 h-32 bg-red-100 rounded-full blur-3xl opacity-30 -z-10 animate-pulse"></div>
         <div className="absolute bottom-0 right-0 w-40 h-40 bg-red-200 rounded-full blur-2xl opacity-20 -z-10 animate-ping"></div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
+          <div className="text-center mb-12" data-aos="fade-up" data-aos-delay="100">
             <h2 className="text-4xl font-extrabold text-gray-900">
               Blood Type <span className="text-red-600">Compatibility</span>
             </h2>
@@ -564,56 +922,92 @@ const Home = () => {
             <div className="w-24 h-1 bg-red-600 mx-auto mt-4 rounded-full animate-pulse"></div>
           </div>
 
-          <div className="hover:scale-[1.01] transition-transform duration-300">
+          <div
+            className="hover:scale-[1.01] transition-transform duration-300 pt-3"
+            data-aos="zoom-in"
+            data-aos-delay="200"
+          >
             <BloodCompatibility />
           </div>
         </div>
-      </section>
+      </section >
 
+      {/* Urgent Blood Needs */}
       <section id="find" className="py-20 bg-gradient-to-b from-white to-red-50 relative overflow-hidden">
         {/* Decorative Blobs */}
-        <div className="absolute top-0 left-0 w-32 h-32 bg-red-100 rounded-full blur-3xl opacity-30 -z-10 animate-pulse"></div>
-        <div className="absolute bottom-0 right-0 w-40 h-40 bg-red-200 rounded-full blur-2xl opacity-20 -z-10 animate-ping"></div>
+        < div className="absolute top-0 left-0 w-32 h-32 bg-red-100 rounded-full blur-3xl opacity-30 -z-10 animate-pulse" >
+          <div className="absolute bottom-0 right-0 w-40 h-40 bg-red-200 rounded-full blur-2xl opacity-20 -z-10 animate-ping"></div>
 
-        <div className="max-w-7xl mx-auto px-6 sm:px-6 lg:px-1">
-          {/* Section Header */}
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-extrabold text-gray-900 tracking-tight mb-4">
-              🩸 Urgent <span className="text-red-600">Blood Needs</span>
-            </h2>
-            <p className="text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto">
-              Some blood types are in <span className="text-red-500 font-semibold">critical demand</span> across Ethiopia.
-            </p>
-            <div className="w-24 h-1 bg-red-600 mx-auto mt-4 rounded-full animate-pulse"></div>
-          </div>
+          <div className="max-w-7xl mx-auto px-6 sm:px-6 lg:px-1">
+            {/* Section Header */}
+            <div
+              className="text-center mb-16"
+              data-aos="fade-down"
+              data-aos-duration="1000"
+              data-aos-easing="ease-in-out"
+            >
+              <h2
+                className="text-4xl font-extrabold text-gray-900 tracking-tight mb-4"
+                data-aos="fade-right"
+                data-aos-delay="200"
+              >
+                🩸 Urgent <span className="text-red-600">Blood Needs</span>
+              </h2>
+              <p
+                className="text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto"
+                data-aos="fade-left"
+                data-aos-delay="400"
+              >
+                Some blood types are in{" "}
+                <span className="text-red-500 font-semibold">critical demand</span> across Ethiopia.
+              </p>
+              <div
+                className="w-24 h-1 bg-red-600 mx-auto mt-4 rounded-full animate-pulse"
+                data-aos="zoom-in"
+                data-aos-delay="600"
+              ></div>
+            </div>
 
-          {/* Blood Cards Grid */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
-            {bloodNeeds.map((blood) => (
-              <BloodNeedCard key={blood.type} {...blood} />
-            ))}
+            {/* Blood Cards Grid */}
+            <div
+              className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12"
+              data-aos="fade-up"
+              data-aos-duration="1200"
+              data-aos-easing="ease-in-out"
+            >
+              {bloodNeeds.map((blood) => (
+                <BloodNeedCard key={blood.type} {...blood} />
+              ))}
+            </div>
           </div>
         </div>
-      </section>
+      </section >
 
-      <section id="centers" className="py-20 bg-white">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div class="text-center mb-16">
-            <h2 class="text-3xl font-bold text-gray-900 mb-4">Find a Blood Center</h2>
-            <p class="text-xl text-gray-600 max-w-3xl mx-auto">Locate our blood donation centers across Ethiopia.</p>
-            <div class="w-20 h-1 bg-red-600 mx-auto mt-4"></div>
+      {/* maps */}
+      < section id="centers" className="py-20 bg-white" >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+          {/* Section Header with Scroll Animation */}
+          <div className="text-center mb-16" data-aos="fade-up">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Find a Blood Center</h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Locate our blood donation centers across Ethiopia.
+            </p>
+            <div className="w-20 h-1 bg-red-600 mx-auto mt-4"></div>
           </div>
 
-          <div class="mb-12">
-            <div id="map"></div>
+          {/* Map Box with Scroll Animation */}
+          <div className="mb-12" data-aos="fade-up">
+            <div id="map" className="h-64 w-full bg-gray-100 rounded shadow-inner"></div>
           </div>
 
+          {/* Cards Container */}
           <div className="container py-5">
             <div className="row g-4">
 
               {/* National Blood Bank Service */}
-              <div className="col-md-6 col-lg-3">
-                <div className="card shadow-sm border-0 h-100">
+              <div className="col-md-6 col-lg-3" data-aos="zoom-in">
+                <div className="card shadow-sm border-0 h-100 hover:shadow-lg transition-shadow duration-300 rounded-lg">
                   <div className="card-body">
                     <h5 className="card-title text-danger fw-bold">National Blood Bank</h5>
                     <p className="text-muted mb-2"><i className="fas fa-map-marker-alt me-2 text-danger"></i>Lideta, Addis Ababa</p>
@@ -634,8 +1028,8 @@ const Home = () => {
               </div>
 
               {/* Somali Regional State Blood Bank */}
-              <div className="col-md-6 col-lg-3">
-                <div className="card shadow-sm border-0 h-100">
+              <div className="col-md-6 col-lg-3" data-aos="zoom-in" data-aos-delay="100">
+                <div className="card shadow-sm border-0 h-100 hover:shadow-lg transition-shadow duration-300 rounded-lg">
                   <div className="card-body">
                     <h5 className="card-title text-danger fw-bold">Somali Region Blood Bank</h5>
                     <p className="text-muted mb-2"><i className="fas fa-map-marker-alt me-2 text-danger"></i>Jijiga, Somali Region</p>
@@ -656,8 +1050,8 @@ const Home = () => {
               </div>
 
               {/* Ethiopian Red Cross Society – Arba Minch */}
-              <div className="col-md-6 col-lg-3">
-                <div className="card shadow-sm border-0 h-100">
+              <div className="col-md-6 col-lg-3" data-aos="zoom-in" data-aos-delay="200">
+                <div className="card shadow-sm border-0 h-100 hover:shadow-lg transition-shadow duration-300 rounded-lg">
                   <div className="card-body">
                     <h5 className="card-title text-danger fw-bold">Red Cross – Arba Minch</h5>
                     <p className="text-muted mb-2"><i className="fas fa-map-marker-alt me-2 text-danger"></i>Arba Minch, SNNPR</p>
@@ -678,8 +1072,8 @@ const Home = () => {
               </div>
 
               {/* Additional Regional Branches */}
-              <div className="col-md-6 col-lg-3">
-                <div className="card shadow-sm border-0 h-100">
+              <div className="col-md-6 col-lg-3" data-aos="zoom-in" data-aos-delay="300">
+                <div className="card shadow-sm border-0 h-100 hover:shadow-lg transition-shadow duration-300 rounded-lg">
                   <div className="card-body">
                     <h5 className="card-title text-danger fw-bold">Other Regional Banks</h5>
                     <ul className="list-unstyled text-muted small">
@@ -695,130 +1089,170 @@ const Home = () => {
             </div>
           </div>
         </div>
-      </section>
+      </ section>
 
-      <section id="contact" className="py-5" style={{ background: '#f7f7f9' }}>
-        <div className="container">
+      {/* message */}
+      < section id="contact" className="py-5 bg-[#f7f7f9]" >
+        <div className="container px-4">
           {/* Section Heading */}
           <div className="text-center mb-5">
-            <h2 className="fw-bold text-dark display-5">Get In Touch</h2>
-            <p className="text-muted lead">Have questions? Reach out to our team — we're always here to help.</p>
+            <h2 className="fw-bold text-dark display-6">Get In Touch</h2>
+            <p className="text-muted text-lg text-gray-100">Have questions? Reach out to our team — we're always here to help.</p>
             <div className="mx-auto mt-3 rounded" style={{ width: '80px', height: '4px', background: 'linear-gradient(to right, #e53935, #e35d5b)' }}></div>
           </div>
 
-          <div className="contact-form-container p-4 bg-white rounded shadow-sm max-w-md mx-auto my-5">
-            <h2 className="text-xl font-bold mb-4 text-center text-red-600">🩸 Contact Us</h2>
-            {status && (
-              <div className={`p-2 text-sm rounded mb-3 ${status.type === "success" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
-                {status.message}
+          <div className="row align-items-center">
+            {/* Thematic Image */}
+            <div className="col-md-6 mb-4 mb-md-0" data-aos="fade-right">
+              <img
+                src={bloodImage}
+                alt="Blood donation in Africa"
+                className="img-fluid rounded shadow"
+              />
+
+              <p className="text-center mt-2 text-muted small">Blood donation saves lives — Be a hero in your community.</p>
+            </div>
+
+            {/* Contact Form */}
+            <div className="col-md-6" data-aos="fade-left">
+              <div className="bg-white p-4 rounded shadow-sm">
+                <h2 className="text-xl font-bold mb-4 text-center text-red-600">🩸 Contact Us</h2>
+
+                {status && (
+                  <div
+                    className={`p-2 text-sm rounded mb-3 ${status.type === "success"
+                      ? "bg-green-100 text-green-700"
+                      : "bg-red-100 text-red-700"
+                      }`}
+                  >
+                    {status.message}
+                  </div>
+                )}
+
+                <form onSubmit={handleSubmit} className="space-y-3">
+                  <input
+                    type="text"
+                    name="name"
+                    placeholder="Your Name"
+                    className="w-full border border-gray-300 p-2 rounded focus:outline-none focus:ring-2 focus:ring-red-400 transition"
+                    value={formData.name}
+                    onChange={handleChange}
+                    required
+                  />
+                  <input
+                    type="email"
+                    name="email"
+                    placeholder="Your Email"
+                    className="w-full border border-gray-300 p-2 rounded focus:outline-none focus:ring-2 focus:ring-red-400 transition"
+                    value={formData.email}
+                    onChange={handleChange}
+                    required
+                  />
+                  <select
+                    name="subject"
+                    className="w-full border border-gray-300 p-2 rounded focus:outline-none focus:ring-2 focus:ring-red-400 transition"
+                    value={formData.subject}
+                    onChange={handleChange}
+                  >
+                    <option>Partnership</option>
+                    <option>Volunteering</option>
+                    <option>Comments</option>
+                    <option>Others</option>
+                  </select>
+                  <textarea
+                    name="message"
+                    placeholder="Your Message"
+                    rows="4"
+                    className="w-full border border-gray-300 p-2 rounded focus:outline-none focus:ring-2 focus:ring-red-400 transition"
+                    value={formData.message}
+                    onChange={handleChange}
+                    required
+                  ></textarea>
+                  <button
+                    type="submit"
+                    className="w-full bg-red-600 text-white py-2 rounded hover:bg-red-700 transition"
+                  >
+                    Send Message
+                  </button>
+                </form>
               </div>
-            )}
-            <form onSubmit={handleSubmit} className="space-y-3">
-              <input
-                type="text"
-                name="name"
-                placeholder="Your Name"
-                className="w-full border p-2 rounded"
-                value={formData.name}
-                onChange={handleChange}
-                required
-              />
-              <input
-                type="email"
-                name="email"
-                placeholder="Your Email"
-                className="w-full border p-2 rounded"
-                value={formData.email}
-                onChange={handleChange}
-                required
-              />
-              <select
-                name="subject"
-                className="w-full border p-2 rounded"
-                value={formData.subject}
-                onChange={handleChange}
-              >
-                <option>Partnership</option>
-                <option>Volunteering</option>
-                <option>Comments</option>
-                <option>Others</option>
-              </select>
-              <textarea
-                name="message"
-                placeholder="Your Message"
-                rows="4"
-                className="w-full border p-2 rounded"
-                value={formData.message}
-                onChange={handleChange}
-                required
-              ></textarea>
-              <button
-                type="submit"
-                className="w-full bg-red-600 text-white py-2 rounded hover:bg-red-700 transition"
-              >
-                Send Message
-              </button>
-            </form>
+            </div>
           </div>
         </div>
-      </section>
+      </ section>
 
-      <footer className="bg-gray-900 text-white py-12">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <div>
-              <div class="flex items-center mb-4">
-                <i class="fas fa-tint text-red-600 text-2xl mr-2"></i>
-                <span class="text-xl font-bold">EthioLife</span>
+      <footer className="bg-dark text-white" style={{ paddingTop: '50px', paddingBottom: "20px" }} data-aos="fade-up">
+        <div className="container-fluid p-5">
+          <div className="row g-4">
+
+            {/* Brand */}
+            <div className="col-12 col-md-6 col-lg-3" data-aos="fade-right">
+              <div className="d-flex align-items-center mb-3">
+                <i className="fas fa-tint text-danger fs-3 me-3 animate-pulse"></i>
+                <span className="fs-4 fw-bold tracking-wide">EthioLife</span>
               </div>
-              <p class="text-gray-400">Connecting blood donors with recipients across Ethiopia to save lives and build healthier communities.</p>
+              <p className="text-secondary">
+                Connecting blood donors with recipients across Ethiopia to save lives and build healthier communities.
+              </p>
             </div>
-            <div>
-              <h4 class="text-lg font-bold mb-4">Quick Links</h4>
-              <ul class="space-y-2">
-                <li><a href="#home" class="text-gray-400 hover:text-white transition duration-300">Home</a></li>
-                <li><a href="#about" class="text-gray-400 hover:text-white transition duration-300">About Us</a></li>
-                <li><a href="#donate" class="text-gray-400 hover:text-white transition duration-300">Donate Blood</a></li>
-                <li><a href="#find" class="text-gray-400 hover:text-white transition duration-300">Find Blood</a></li>
-                <li><a href="#centers" class="text-gray-400 hover:text-white transition duration-300">Blood Centers</a></li>
+
+            {/* Blood Donation Facts */}
+            <div className="col-12 col-md-6 col-lg-3" data-aos="fade-up">
+              <h4 className="h5 fw-semibold mb-3 border-bottom border-danger pb-1 d-inline-block">Did You Know?</h4>
+              <ul className="list-unstyled text-secondary">
+                <li>🩸 Every 2 seconds someone needs blood.</li>
+                <li>🩸 One donation can save up to 3 lives.</li>
+                <li>🩸 Blood donation is safe and simple.</li>
+                <li>🩸 Healthy adults can donate every 56 days.</li>
               </ul>
             </div>
-            <div>
-              <h4 class="text-lg font-bold mb-4">Resources</h4>
-              <ul class="space-y-2">
-                <li><a href="#" class="text-gray-400 hover:text-white transition duration-300">Blood Donation FAQs</a></li>
-                <li><a href="#" class="text-gray-400 hover:text-white transition duration-300">Eligibility Criteria</a></li>
-                <li><a href="#" class="text-gray-400 hover:text-white transition duration-300">Donation Process</a></li>
-                <li><a href="#" class="text-gray-400 hover:text-white transition duration-300">Health Benefits</a></li>
-                <li><a href="#" class="text-gray-400 hover:text-white transition duration-300">Myths & Facts</a></li>
+
+            {/* Quick Links */}
+            <div className="col-12 col-md-6 col-lg-3" data-aos="fade-up">
+              <h4 className="h5 fw-semibold mb-3 border-bottom border-danger pb-1 d-inline-block">Quick Links</h4>
+              <ul className="list-unstyled">
+                {["home", "about", "donate", "find", "centers"].map(section => (
+                  <li key={section} className="d-flex align-items-center mb-2">
+                    <ChevronRightIcon className="me-2 text-danger" style={{ width: '1rem', height: '1rem' }} />
+                    <a
+                      href={`#${section}`}
+                      className="text-secondary text-decoration-none hover-danger"
+                    >
+                      {section.charAt(0).toUpperCase() + section.slice(1).replace('-', ' ')}
+                    </a>
+                  </li>
+                ))}
               </ul>
             </div>
-            <div>
-              <h4 class="text-lg font-bold mb-4">Emergency Contacts</h4>
-              <ul class="space-y-2">
-                <li class="flex items-center">
-                  <i class="fas fa-phone-alt text-red-600 mr-2"></i>
-                  <span class="text-gray-400">+251 91 123 4567</span>
-                </li>
-                <li class="flex items-center">
-                  <i class="fas fa-ambulance text-red-600 mr-2"></i>
-                  <span class="text-gray-400">+251 92 234 5678</span>
-                </li>
-                <li class="flex items-center">
-                  <i class="fas fa-hospital text-red-600 mr-2"></i>
-                  <span class="text-gray-400">Black Lion Hospital: +251 11 111 1111</span>
-                </li>
-              </ul>
+
+            {/* Newsletter */}
+            <div className="col-12 col-md-6 col-lg-3" data-aos="fade-left">
+              <h4 className="h5 fw-semibold mb-3 border-bottom border-danger pb-1 d-inline-block">Stay Updated</h4>
+              <p className="text-secondary mb-3">Subscribe to our newsletter</p>
+              <form onSubmit={handleSubscribe} className="d-flex flex-column flex-sm-row gap-2">
+                <input
+                  type="email"
+                  placeholder="Your email"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  required
+                  className="form-control"
+                />
+                <button type="submit" className="btn btn-danger text-white">
+                  Subscribe
+                </button>
+              </form>
+              {msg && <p className="text-success small mt-2">{msg}</p>}
+              {error && <p className="text-danger small mt-2">{error}</p>}
             </div>
           </div>
 
-          <div class="border-t border-gray-800 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center">
-            <p class="text-gray-400 mb-4 md:mb-0">© 2023 EthioLife Blood Bank. All rights reserved.</p>
-            <div class="flex space-x-6">
-              <a href="#" class="text-gray-400 hover:text-white transition duration-300">Privacy Policy</a>
-              <a href="#" class="text-gray-400 hover:text-white transition duration-300">Terms of Service</a>
-              <a href="#" class="text-gray-400 hover:text-white transition duration-300">Sitemap</a>
-            </div>
+          {/* Bottom Section */}
+          <div
+            className="border-top border-secondary mt-4 pt-3 d-flex flex-column flex-md-row justify-content-center align-items-center text-secondary small"
+            data-aos="fade-up"
+          >
+            <p className="mb-2 mb-md-0">© 2023 EthioLife Blood Bank. All rights reserved.</p>
           </div>
         </div>
       </footer>
