@@ -53,6 +53,7 @@ const AdminSidebar = () => {
       ]
     },
     { key: 'settings', label: 'Settings', icon: <Settings size={18} />, to: '/settings' },
+    { key: 'newslatter', label: 'NewsLatter', icon: <Newslatter size={18} />, to: '/newsletter' },
   ];
 
   return (

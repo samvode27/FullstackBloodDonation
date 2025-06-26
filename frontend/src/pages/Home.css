@@ -4,9 +4,12 @@
 }
 
 @keyframes pulse {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0);
   }
+
   50% {
     transform: translateY(-5px);
   }
@@ -31,6 +34,7 @@
   font-size: 1rem;
   transition: 0.3s ease-in-out;
 }
+
 .social-icon:hover {
   background-color: #dc3545;
   color: white;
@@ -40,4 +44,102 @@
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.05);
   background: #fff;
   border-radius: 10px;
+}
+
+
+/* Home campaigns container */
+.home-campaigns {
+  max-width: 1100px;
+  margin: 3rem auto;
+  padding: 1rem 2rem;
+  font-family: 'Poppins', sans-serif;
+}
+
+/* Section Title */
+.home-campaigns h2 {
+  text-align: center;
+  font-size: 2.75rem;
+  font-weight: 800;
+  margin-bottom: 3rem;
+  color: #dc2626;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Grid layout */
+.home-campaigns .grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2.5rem;
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  display: inline-flex;
+  animation: marquee linear infinite;
+  animation-duration: 40s; /* Overridden inline */
+  animation-play-state: running;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+/* Pause utility */
+.hover\:pause:hover {
+  animation-play-state: paused !important;
+}
+
+/* Line clamp 3 (optional, for truncating text) */
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;      /* WebKit */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+
+  line-clamp: 3;              /* Standard (experimental) */
+  box-orient: vertical;
+}
+
+/* Hide scrollbars for cleaner marquee effect */
+::-webkit-scrollbar {
+  display: none;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.modal-scrollable {
+  max-height: 90vh;            /* Prevents modal from exceeding screen height */
+  overflow-y: auto;            /* Enables scrolling inside */
+  scrollbar-width: thin;       /* Firefox scroll style */
+}
+
+/* Optional: Custom scrollbar styling for WebKit browsers */
+.modal-scrollable::-webkit-scrollbar {
+  width: 6px;
+}
+.modal-scrollable::-webkit-scrollbar-thumb {
+  background-color: #d1d5db;   /* Tailwind gray-300 */
+  border-radius: 6px;
 }

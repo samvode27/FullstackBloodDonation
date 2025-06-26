@@ -29,7 +29,6 @@ const registerAdmin = async (req, res) => {
   }
 };
 
-
 // LOGIN Admin
 const loginAdmin = async (req, res) => {
   try {
