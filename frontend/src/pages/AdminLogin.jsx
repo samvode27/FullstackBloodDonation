@@ -49,7 +49,6 @@ const AdminLogin = () => {
               className="admin-login-logo mb-3"
             />
             <h2 className="admin-login-title">Admin Login</h2>
-            <p className="admin-login-subtitle">Access the blood bank management dashboard</p>
           </div>
 
           <form onSubmit={handleLogin}>
