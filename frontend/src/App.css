@@ -64,36 +64,6 @@ body.dark .header {
   transition: transform 0.3s;
 }
 
-/* Search Bar */
-.search-bar {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background-color: #f0f0f0;
-  padding: 6px 12px;
-  border-radius: 8px;
-  max-width: 300px;
-  flex-grow: 1;
-  margin: 0 20px;
-}
-
-.search-bar input {
-  border: none;
-  outline: none;
-  background: transparent;
-  font-size: 14px;
-  width: 100%;
-  color: #333;
-}
-
-body.dark .search-bar {
-  background-color: #2a2a2a;
-}
-
-body.dark .search-bar input {
-  color: #fff;
-}
-
 /* Header Right - Icons & Profile */
 .header-right {
   display: flex;
@@ -376,5 +346,13 @@ body.dark .main-container {
   height: 20px;
 }
 
+/* App.css or Sidebar.css */
+.sidebar {
+  transition: transform 0.3s ease;
+}
+
+.sidebar.sidebar-responsive {
+  transform: translateX(0);
+}
 
 

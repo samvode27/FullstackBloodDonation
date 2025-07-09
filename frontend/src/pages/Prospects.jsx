@@ -32,7 +32,6 @@ const Prospects = () => {
         );
       },
     },
-
   ];
 
   useEffect(() => {

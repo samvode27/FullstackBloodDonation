@@ -1,41 +1,33 @@
-/* DonorForgot.css */
+/* Verify.css */
 
-.forgot-wrapper {
-  min-height: 100vh;
-  background: linear-gradient(to bottom right, #fff5f5, #ffe6e6);
-  padding: 2rem;
+.verify-container {
+  background: linear-gradient(135deg, #f8f9fa, #e0eafc);
 }
 
-.forgot-card {
-  max-width: 480px;
-  width: 100%;
-  border-radius: 1rem;
+.verify-container form {
   background-color: #ffffff;
-  animation: fadeInDown 0.6s ease-in-out;
 }
 
-input.form-control:focus {
-  border-color: #dc3545;
-  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+.verify-container h4 {
+  color: #0d6efd;
 }
 
-.btn-danger {
-  font-weight: 600;
-  letter-spacing: 0.5px;
-  transition: transform 0.3s ease;
+.verify-container input:focus {
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
 }
 
-.btn-danger:hover {
-  transform: scale(1.03);
+.verify-container .btn-primary {
+  background-color: #0d6efd;
+  border-color: #0d6efd;
 }
 
-@keyframes fadeInDown {
-  from {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.verify-container .btn-outline-primary {
+  border-color: #0d6efd;
+  color: #0d6efd;
+}
+
+.verify-container .btn-outline-primary:hover {
+  background-color: #0d6efd;
+  color: #ffffff;
 }

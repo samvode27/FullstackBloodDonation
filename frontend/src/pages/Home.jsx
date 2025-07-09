@@ -10,7 +10,6 @@ import { adminRequest, publicRequest } from "../requestMethods";
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 import bloodImage from '../assets/a.jpg';
-import backgroundImage from '../assets/home.png';
 import { ChevronRightIcon } from '@heroicons/react/24/solid';
 
 const Home = () => {
@@ -30,6 +29,57 @@ const Home = () => {
   const [msg, setMsg] = useState('');
   const [error, setError] = useState('');
   const [campaigns, setCampaigns] = useState([]);
+
+  const [pulsePhase, setPulsePhase] = useState(0);
+  const [ripples, setRipples] = useState([]);
+
+  // Animate pulse continuously
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setPulsePhase((prev) => (prev + 0.02) % (2 * Math.PI));
+    }, 20);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Calculate scale and glow
+  const pulseScale = 1 + Math.sin(pulsePhase) * 0.05;
+  const pulseGlow = Math.abs(Math.sin(pulsePhase) * 0.4);
+
+  // Handle click ripple
+  const handleClick = (e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    setRipples((prev) => [
+      ...prev,
+      {
+        id: Date.now(),
+        x,
+        y,
+        size: 0,
+        opacity: 1,
+      },
+    ]);
+    navigate("/donorlogin");
+  };
+
+  // Animate ripple growth and fade
+  useEffect(() => {
+    if (ripples.length > 0) {
+      const animationFrame = requestAnimationFrame(() => {
+        setRipples((prev) =>
+          prev
+            .map((ripple) => ({
+              ...ripple,
+              size: ripple.size + 4,
+              opacity: ripple.opacity - 0.03,
+            }))
+            .filter((ripple) => ripple.opacity > 0)
+        );
+      });
+      return () => cancelAnimationFrame(animationFrame);
+    }
+  }, [ripples]);
 
   useEffect(() => {
     const fetchCampaigns = async () => {
@@ -460,28 +510,18 @@ const Home = () => {
               </p>
 
               <div
-                className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 items-center justify-center mt-6"
+                className="space-y-4 sm:space-y-0 sm:space-x-4 items-center justify-center mt-6"
                 data-aos="fade-up"
                 data-aos-delay="600"
               >
                 <button
-                  className="flex items-center justify-center gap-2 bg-white text-red-600 px-6 py-3 rounded-full font-bold shadow-md hover:bg-gray-100 hover:shadow-lg transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-red-400"
+                  className="flex justify-center items-center gap-2 bg-red-600 text-white-600 px-6 py-3 rounded-full font-bold shadow-md hover:bg-gray-100 hover:text-red-600 hover:shadow-lg transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-red-400"
                   onClick={() => navigate('/donorlogin')}
                   data-aos="zoom-in"
                   data-aos-delay="700"
                 >
                   <i className="fas fa-heart animate-pulse text-red-500"></i>
                   Become a Donor
-                </button>
-
-                <button
-                  className="flex items-center justify-center gap-2 border-2 border-white text-white px-6 py-3 rounded-full font-bold shadow-md hover:text-red-600 hover:shadow-lg transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-white"
-                  onClick={() => navigate('/findblood')}
-                  data-aos="zoom-in"
-                  data-aos-delay="800"
-                >
-                  <i className="fas fa-search animate-bounce"></i>
-                  Find Blood Now
                 </button>
               </div>
             </div>
@@ -732,112 +772,31 @@ const Home = () => {
         </div>
       </section>
 
-      <div className="relative overflow-hidden py-8 bg-gray-50" style={{ paddingBottom: "100px" }}>
-        <h2 className="text-3xl font-bold mb-6 text-center text-red-600">
-          Current Blood Donation Campaigns
-        </h2>
-        <div className="w-20 h-1 bg-gray-600 mx-auto rounded-full"></div>
+      {/* compatibility */}
+      <section className="pt-20 pb-1 bg-gradient-to-br from-gray-50 to-white relative overflow-hidden" data-aos="fade-up">
+        <div className="absolute top-0 left-0 w-32 h-32 bg-red-100 rounded-full blur-3xl opacity-30 -z-10 animate-pulse"></div>
+        <div className="absolute bottom-0 right-0 w-40 h-40 bg-red-200 rounded-full blur-2xl opacity-20 -z-10 animate-ping"></div>
 
-        <div ref={containerRef} className="relative h-[360px] w-full" style={{ marginTop: '100px' }}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12" data-aos="fade-up" data-aos-delay="100">
+            <h2 className="text-4xl font-extrabold text-gray-900">
+              Blood Type <span className="text-red-600">Compatibility</span>
+            </h2>
+            <p className="text-lg text-gray-600 mt-2">
+              Know who you can donate to and receive from — <span className="text-red-500 font-medium">save lives</span>.
+            </p>
+            <div className="w-24 h-1 bg-red-600 mx-auto mt-4 rounded-full animate-pulse"></div>
+          </div>
+
           <div
-            ref={contentRef}
-            className="absolute top-0 left-0 flex items-center h-full"
-            style={{ willChange: 'transform' }}
+            className="hover:scale-[1.01] transition-transform duration-300 pt-3"
+            data-aos="zoom-in"
+            data-aos-delay="200"
           >
-            {loopedCampaigns.map(({ _id, title, description, date, imageUrl }, index) => (
-              <div
-                key={`${_id}-${index}`}
-                className="flex-shrink-0 mx-4 w-80 bg-white rounded-lg shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl hover:scale-105"
-              >
-                <div className="h-40 overflow-hidden">
-                  {imageUrl ? (
-                    <img
-                      src={`http://localhost:8000/uploads/${imageUrl}`}
-                      alt={title}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-400 italic">
-                      No Image
-                    </div>
-                  )}
-                </div>
-                <div className="p-4">
-                  <h3 className="text-lg font-semibold text-red-700 mb-1">{title}</h3>
-                  <p className="text-gray-600 text-sm">
-                    {description.split(' ').length > 20
-                      ? description.split(' ').slice(0, 30).join(' ') + '...'
-                      : description
-                    }
-                  </p>
-                  {description.split(' ').length > 30 && (
-                    <button
-                      onClick={() =>
-                        setSelectedCampaign({ title, description, date, imageUrl })
-                      }
-                      className="text-red-600 text-xs mt-1 hover:underline"
-                    >
-                      Read more
-                    </button>
-                  )}
-                  <div className="mt-3 flex items-center justify-between">
-                    <span className="text-xs text-gray-500">
-                      {new Date(date).toLocaleDateString()}
-                    </span>
-                    <button
-                      onClick={() => navigate('/donorlogin')}
-                      className="bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-1 rounded-full"
-                    >
-                      Donate Now
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
+            <BloodCompatibility />
           </div>
         </div>
-
-        {/* Modal */}
-        {selectedCampaign && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 z-50 overflow-y-auto flex justify-center px-4 py-10">
-            <div className="bg-white rounded-xl shadow-lg max-w-md w-full p-6 relative animate-fadeIn">
-              <button
-                onClick={() => setSelectedCampaign(null)}
-                className="absolute top-2 right-3 text-gray-600 hover:text-red-600 text-xl font-bold"
-              >
-                &times;
-              </button>
-
-              {selectedCampaign.imageUrl ? (
-                <img
-                  src={`http://localhost:8000/uploads/${selectedCampaign.imageUrl}`}
-                  alt={selectedCampaign.title}
-                  className="w-full h-40 object-cover rounded-lg mb-4"
-                />
-              ) : (
-                <div className="w-full h-40 bg-gray-200 rounded-lg flex items-center justify-center text-gray-400 italic mb-4">
-                  No Image
-                </div>
-              )}
-
-              <h3 className="text-xl font-bold text-red-700 mb-2">{selectedCampaign.title}</h3>
-              <p className="text-gray-700 mb-3">{selectedCampaign.description}</p>
-              <p className="text-sm text-gray-500 mb-4">
-                Date: {new Date(selectedCampaign.date).toLocaleDateString()}
-              </p>
-              <button
-                onClick={() => {
-                  setSelectedCampaign(null);
-                  navigate('/donorlogin');
-                }}
-                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-full w-full transition-all"
-              >
-                Donate Now
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
+      </section >
 
       {/* Ready to Donate */}
       <section section id="donate" className="py-20 bg-white" >
@@ -906,31 +865,111 @@ const Home = () => {
         </div>
       </section >
 
-      {/* compatibility */}
-      <section className="pt-20 pb-1 bg-gradient-to-br from-gray-50 to-white relative overflow-hidden" data-aos="fade-up">
-        <div className="absolute top-0 left-0 w-32 h-32 bg-red-100 rounded-full blur-3xl opacity-30 -z-10 animate-pulse"></div>
-        <div className="absolute bottom-0 right-0 w-40 h-40 bg-red-200 rounded-full blur-2xl opacity-20 -z-10 animate-ping"></div>
+      <div className="relative overflow-hidden" style={{ paddingBottom: "40px" }}>
+        <h2 className="text-3xl font-bold mb-6 text-center text-red-600">
+          Current Blood Donation Campaigns
+        </h2>
+        <div className="w-20 h-1 bg-gray-600 mx-auto rounded-full"></div>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12" data-aos="fade-up" data-aos-delay="100">
-            <h2 className="text-4xl font-extrabold text-gray-900">
-              Blood Type <span className="text-red-600">Compatibility</span>
-            </h2>
-            <p className="text-lg text-gray-600 mt-2">
-              Know who you can donate to and receive from — <span className="text-red-500 font-medium">save lives</span>.
-            </p>
-            <div className="w-24 h-1 bg-red-600 mx-auto mt-4 rounded-full animate-pulse"></div>
-          </div>
-
+        <div ref={containerRef} className="relative h-[400px] w-full" style={{ marginTop: '100px' }}>
           <div
-            className="hover:scale-[1.01] transition-transform duration-300 pt-3"
-            data-aos="zoom-in"
-            data-aos-delay="200"
+            ref={contentRef}
+            className="absolute top-0 left-0 flex items-center h-full"
+            style={{ willChange: 'transform' }}
           >
-            <BloodCompatibility />
+            {loopedCampaigns.map(({ _id, title, description, date, imageUrl }, index) => (
+              <div
+                key={`${_id}-${index}`}
+                className="flex-shrink-0 mx-4 w-80 bg-white rounded-lg shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl hover:scale-105"
+              >
+                <div className="h-40 overflow-hidden">
+                  {imageUrl ? (
+                    <img
+                      src={`http://localhost:8000/uploads/${imageUrl}`}
+                      alt={title}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-400 italic">
+                      No Image
+                    </div>
+                  )}
+                </div>
+                <div className="p-4">
+                  <h3 className="text-lg font-semibold text-red-700 mb-1">{title}</h3>
+                  <p className="text-gray-600 text-sm">
+                    {description.split(' ').length > 20
+                      ? description.split(' ').slice(0, 30).join(' ') + '...'
+                      : description
+                    }
+                  </p>
+                  {description.split(' ').length > 30 && (
+                    <button
+                      onClick={() =>
+                        setSelectedCampaign({ title, description, date, imageUrl })
+                      }
+                      className="text-red-600 text-xs mt-1 hover:underline"
+                    >
+                      Read more
+                    </button>
+                  )}
+                  <div className="mt-3 flex items-center justify-between">
+                    <span className="text-xs text-gray-500">
+                      {new Date(date).toLocaleDateString()}
+                    </span>
+                    <button
+                      onClick={() => navigate('/donorlogin')}
+                      className="animate-gradient animate-float animate-glow-ring bg-gradient-to-r from-red-500 via-red-600 to-red-700 text-white text-sm px-4 py-1 rounded-full shadow-md hover:scale-110 hover:shadow-xl transform transition duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-red-400 tracking-wide">
+                      Donate Now
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
-      </section >
+
+        {/* Modal */}
+        {selectedCampaign && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 z-50 overflow-y-auto flex justify-center px-4 py-10">
+            <div className="bg-white rounded-xl shadow-lg max-w-md w-full p-6 relative animate-fadeIn">
+              <button
+                onClick={() => setSelectedCampaign(null)}
+                className="absolute top-2 right-3 text-gray-600 hover:text-red-600 text-xl font-bold"
+              >
+                &times;
+              </button>
+
+              {selectedCampaign.imageUrl ? (
+                <img
+                  src={`http://localhost:8000/uploads/${selectedCampaign.imageUrl}`}
+                  alt={selectedCampaign.title}
+                  className="w-full h-40 object-cover rounded-lg mb-4"
+                />
+              ) : (
+                <div className="w-full h-40 bg-gray-200 rounded-lg flex items-center justify-center text-gray-400 italic mb-4">
+                  No Image
+                </div>
+              )}
+
+              <h3 className="text-xl font-bold text-red-700 mb-2">{selectedCampaign.title}</h3>
+              <p className="text-gray-700 mb-3">{selectedCampaign.description}</p>
+              <p className="text-sm text-gray-500 mb-4">
+                Date: {new Date(selectedCampaign.date).toLocaleDateString()}
+              </p>
+              <button
+                onClick={() => {
+                  setSelectedCampaign(null);
+                  navigate('/donorlogin');
+                }}
+                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-full w-full transition-all"
+              >
+                Donate Now
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* Urgent Blood Needs */}
       <section id="find" className="py-20 bg-gradient-to-b from-white to-red-50 relative overflow-hidden">

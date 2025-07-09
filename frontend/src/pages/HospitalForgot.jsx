@@ -40,16 +40,18 @@ const HospitalForgot = () => {
   };
 
   return (
-    <div className="forgot-wrapper d-flex justify-content-center align-items-center">
-      <ToastContainer position="top-center" />
-      <div className="forgot-card card p-4 shadow" style={{ maxWidth: '500px', width: '100%' }}>
-        <h3 className="text-center text-danger mb-4">Hospital Forgot Password</h3>
-        <form onSubmit={codeSent ? handleVerifyCode : handleSendCode}>
-          <div className="form-group mb-3">
-            <label htmlFor="email" className="form-label">Email address</label>
+    <div className="verify-container d-flex justify-content-center align-items-center min-vh-100 p-3">
+      <ToastContainer />
+
+      <div>        
+        <form onSubmit={codeSent ? handleVerifyCode : handleSendCode}  className="p-4 border rounded shadow-sm" style={{ width: '350px' }}>
+          <h4 className="text-center mb-4">Hospital Forgot Password</h4>
+
+          <div className="mb-3">
+            <label htmlFor="email" className="form-label fw-medium">Email address</label>
             <input
               type="email"
-              className="form-control"
+              className="form-control py-2"
               id="email"
               required
               value={email}

@@ -45,12 +45,6 @@
   transform: translateY(-4px);
 }
 
-.charts-container {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2rem;
-  margin-bottom: 2rem;
-}
 
 .chart-box {
   background: var(--card-bg);
@@ -168,3 +162,4 @@
 .dark .badge-bronze {
   color: #eee;
 }
+

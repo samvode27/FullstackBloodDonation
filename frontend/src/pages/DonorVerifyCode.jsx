@@ -1,12 +1,11 @@
 // src/pages/DonorVerifyCode.jsx
-import React, { useState,  useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
 import { publicRequest } from '../requestMethods';
 import { useNavigate, useLocation } from 'react-router-dom';
-import './DonorVerifyCode.css'; // optional CSS file
+import './DonorVerifyCode.css';
 
 const DonorVerifyCode = () => {
-
   const [code, setCode] = useState('');
   const [resending, setResending] = useState(false);
   const location = useLocation();
@@ -45,22 +44,44 @@ const DonorVerifyCode = () => {
   };
 
   return (
-    <div className="verify-wrapper d-flex justify-content-center align-items-center min-vh-100">
+    <div className="verify-container d-flex justify-content-center align-items-center min-vh-100 p-3">
       <ToastContainer />
-      <div className="verify-card card shadow p-4 rounded" style={{ width: '100%', maxWidth: 450 }}>
-        <h3 className="text-center mb-4 text-primary">Verify Your Email</h3>
-        <form onSubmit={handleVerify}>
+      <div>
+        <form onSubmit={handleVerify} className="p-4 border rounded shadow-sm" style={{ width: '350px' }}>
+          <h4 className="mb-4 text-center">Verify Your Email</h4>
+
           <div className="mb-3">
-            <label className="form-label">Email</label>
-            <input className="form-control" type="email" value={email} required onChange={(e) => setEmail(e.target.value)} />
+            <label htmlFor="emailInput" className="form-label fw-medium">Email Address</label>
+            <input
+              id="emailInput"
+              type="email"
+              className="form-control py-2"
+              value={email}
+              required
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="your.email@example.com"
+            />
           </div>
+
           <div className="mb-3">
-            <label className="form-label">Verification Code</label>
-            <input className="form-control" type="text" value={code} required onChange={(e) => setCode(e.target.value)} />
+            <label htmlFor="code" className="form-label fw-medium">Verification Code</label>
+            <input id="codeInput"
+              type="text"
+              className="form-control py-2"
+              value={code}
+              required
+              onChange={(e) => setCode(e.target.value)}
+              placeholder="Enter code here" />
           </div>
-          <button type="submit" className="btn btn-primary w-100">Verify</button>
+
+          <button type="submit" className="btn btn-primary w-100 fw-semibold py-1 fs-5">Verify</button>
         </form>
-        <button onClick={handleResend} className="btn btn-link mt-3 w-100" disabled={resending}>
+
+        <button
+          onClick={handleResend}
+          disabled={resending}
+          className="resendbtn mt-3 w-100 fw-semibold py-2"
+        >
           {resending ? 'Resending...' : 'Resend Code'}
         </button>
       </div>

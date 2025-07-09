@@ -1,8 +1,9 @@
-// src/pages/admin/Hospitals.jsx
 import React, { useEffect, useState } from 'react';
-import { publicRequest } from '../requestMethods';
+import { adminRequest, publicRequest } from '../requestMethods';
 import {
   Modal,
+  Row,
+  Col,
   Button,
   Form,
   Spinner,
@@ -11,18 +12,19 @@ import {
   Pagination,
 } from 'react-bootstrap';
 import './Hospitals.css';
-import { Pencil, Trash2, CheckCircle, XCircle } from 'lucide-react';
+import autoTable from 'jspdf-autotable';
+import jsPDF from 'jspdf';
+import * as XLSX from 'xlsx';
+import { Pencil, Trash, CheckCircle, XCircle } from 'lucide-react';
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Hospitals = () => {
   const [hospitals, setHospitals] = useState([]);
-  const [stats, setStats] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [statsLoading, setStatsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [statsError, setStatsError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [showEditModal, setShowEditModal] = useState(false);
-  const [editHospital, setEditHospital] = useState(null);
   const [formLoading, setFormLoading] = useState(false);
   const [formError, setFormError] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -33,12 +35,22 @@ const Hospitals = () => {
   const itemsPerPage = 8;
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
   const [verifiedFilter, setVerifiedFilter] = useState('');
-  const [bloodGroupFilter, setBloodGroupFilter] = useState('');
 
+  // Edit Form State
+  const [editForm, setEditForm] = useState({
+    _id: '',
+    name: '',
+    email: '',
+    tel: '',
+    address: '',
+    verified: false,
+    profileImage: '',
+    licenseNumber: '',
+    licenseDocument: '',
+  });
 
   useEffect(() => {
     fetchHospitals();
-    fetchStats();
   }, []);
 
   const fetchHospitals = async () => {
@@ -53,29 +65,15 @@ const Hospitals = () => {
     }
   };
 
-  const fetchStats = async () => {
-    try {
-      setStatsLoading(true);
-      const res = await publicRequest.get('/hospitals/stats');
-      setStats(res.data);
-      setStatsLoading(false);
-    } catch (err) {
-      setStatsError('Failed to load hospital stats.');
-      setStatsLoading(false);
-    }
-  };
-
   const filteredHospitals = hospitals.filter(hospital =>
-    (hospital.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      hospital.email.toLowerCase().includes(searchTerm.toLowerCase())) &&
-    (bloodGroupFilter === '' || hospital.bloodgroup === bloodGroupFilter) &&
+    (hospital.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      hospital.email?.toLowerCase().includes(searchTerm.toLowerCase())) &&
     (verifiedFilter === '' ||
       (verifiedFilter === 'verified' && hospital.verified) ||
       (verifiedFilter === 'unverified' && !hospital.verified))
   );
 
-
-  const requestSort = key => {
+  const requestSort = (key) => {
     let direction = 'asc';
     if (sortConfig.key === key && sortConfig.direction === 'asc') {
       direction = 'desc';
@@ -102,40 +100,78 @@ const Hospitals = () => {
     currentPage * itemsPerPage
   );
 
-  const handleEditClick = hospital => {
-    setEditHospital({ ...hospital });
-    setFormError(null);
+  const handleEditClick = (hospital) => {
+    setEditForm({
+      _id: hospital._id,
+      name: hospital.name || '',
+      email: hospital.email || '',
+      tel: hospital.tel || '',
+      address: hospital.address || '',
+      verified: hospital.verified || false,
+      profileImage: hospital.profileImage || '',
+      licenseNumber: hospital.licenseNumber || '',
+      licenseDocument: hospital.officialDocument || '',
+    });
     setShowEditModal(true);
   };
 
-  const handleFormChange = e => {
-    setEditHospital(prev => ({ ...prev, [e.target.name]: e.target.value }));
-  };
-
-  const handleFormSubmit = async e => {
-    e.preventDefault();
-    setFormLoading(true);
-    try {
-      const { _id, name, email, address, tel } = editHospital;
-      const res = await publicRequest.put(`/hospitals/updateprofile/${_id}`, {
-        name,
-        email,
-        address,
-        tel,
-      });
-      setHospitals(prev =>
-        prev.map(h => (h._id === _id ? res.data.hospital : h))
-      );
-      setShowEditModal(false);
-    } catch {
-      setFormError('Failed to update profile.');
+  const handleInputChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    if (type === 'checkbox') {
+      setEditForm(prev => ({ ...prev, [name]: checked }));
+    } else {
+      setEditForm(prev => ({ ...prev, [name]: value }));
     }
-    setFormLoading(false);
   };
 
-  const handleDeleteClick = hospital => {
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    setEditForm((prev) => ({
+      ...prev,
+      licenseDocument: file,
+    }));
+  };
+
+  const handleEditSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      setFormLoading(true);
+
+      const formData = new FormData();
+      formData.append('name', editForm.name);
+      formData.append('email', editForm.email);
+      formData.append('tel', editForm.tel);
+      formData.append('address', editForm.address);
+      formData.append('verified', editForm.verified);
+      formData.append('licenseNumber', editForm.licenseNumber);
+
+      if (editForm.licenseDocument instanceof File) {
+        formData.append('officialDocument', editForm.licenseDocument);
+      }
+
+      const res = await adminRequest.put(
+        `/hospitals/${editForm._id}`,
+        formData,
+        { headers: { 'Content-Type': 'multipart/form-data' } }
+      );
+
+      const updated = hospitals.map((h) =>
+        h._id === res.data.hospital._id ? res.data.hospital : h
+      );
+
+      setHospitals(updated);
+      setShowEditModal(false);
+      toast.success("Hospital updated successfully");
+    } catch (err) {
+      console.error('Update failed:', err);
+      toast.error(err?.response?.data?.message || "Failed to update hospital");
+    } finally {
+      setFormLoading(false);
+    }
+  };
+
+  const confirmDelete = (hospital) => {
     setDeleteHospital(hospital);
-    setDeleteError(null);
     setShowDeleteModal(true);
   };
 
@@ -147,6 +183,7 @@ const Hospitals = () => {
         prev.filter(h => h._id !== deleteHospital._id)
       );
       setShowDeleteModal(false);
+      toast.success("Hospital deleted successfully");
     } catch {
       setDeleteError('Failed to delete hospital.');
     }
@@ -156,35 +193,83 @@ const Hospitals = () => {
   const SortArrow = ({ column }) =>
     sortConfig.key === column ? (sortConfig.direction === 'asc' ? ' ▲' : ' ▼') : null;
 
+  const handlePDFExport = () => {
+    const doc = new jsPDF();
+    doc.text('Hospital List Report', 14, 10);
+    autoTable(doc, {
+      head: [[
+        'Name', 'Email', 'Address', 'Telephone', 'License No.', 'Verified'
+      ]],
+      body: filteredHospitals.map(d => [
+        d.name || '-',
+        d.email || '-',
+        d.address || '-',
+        d.tel || 0,
+        d.licenseNumber || '-',
+        d.verified ? 'Yes' : 'No',
+      ]),
+    });
+    doc.save('hospitals_report.pdf');
+  };
+
+  const handleExcelExport = () => {
+    const wsData = [
+      ['Name', 'Email', 'Address', 'Telephone', 'License No.', 'Verified'],
+      ...filteredHospitals.map(d => [
+        d.name || '-',
+        d.email || '-',
+        d.address || '-',
+        d.tel || 0,
+        d.licenseNumber || '-',
+        d.verified ? 'Yes' : 'No',
+      ])
+    ];
+    const ws = XLSX.utils.aoa_to_sheet(wsData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Hospitals');
+    XLSX.writeFile(wb, 'hospitals.xlsx');
+  };
+
   return (
     <div className="hospitals-page container mt-4">
-      <h1 className="mb-4">Hospitals Management</h1>
+      <ToastContainer />
 
-      <Form.Group controlId="searchHospital" className="mb-3">
-        <Form.Control
-          type="search"
-          placeholder="Search by name or email..."
-          value={searchTerm}
-          onChange={e => {
-            setSearchTerm(e.target.value);
-            setCurrentPage(1);
-          }}
-        />
-      </Form.Group>
+      <div className="d-flex justify-content-end flex-wrap gap-2 mt-3 mb-3">
+        <div className="action-buttons-group">
+          <button className='export-btn' onClick={handlePDFExport}>Export PDF</button>
+          <button className='export-btn' onClick={handleExcelExport}>Export Excel</button>
+        </div>
+      </div>
 
-      <Form.Select
-        className="mb-3"
-        value={verifiedFilter}
-        onChange={e => {
-          setVerifiedFilter(e.target.value);
-          setCurrentPage(1); // Reset pagination
-        }}
-      >
-        <option value="">All Hospitals</option>
-        <option value="verified">Only Verified</option>
-        <option value="unverified">Only Unverified</option>
-      </Form.Select>
-
+      <Row>
+        <Col md={6}>
+          <Form.Group controlId="searchHospital" className="mb-3">
+            <Form.Control
+              type="search"
+              placeholder="Search by name or email..."
+              value={searchTerm}
+              onChange={e => {
+                setSearchTerm(e.target.value);
+                setCurrentPage(1);
+              }}
+            />
+          </Form.Group>
+        </Col>
+        <Col md={6}>
+          <Form.Select
+            className="mb-3"
+            value={verifiedFilter}
+            onChange={e => {
+              setVerifiedFilter(e.target.value);
+              setCurrentPage(1);
+            }}
+          >
+            <option value="">All Hospitals</option>
+            <option value="verified">Only Verified</option>
+            <option value="unverified">Only Unverified</option>
+          </Form.Select>
+        </Col>
+      </Row>
 
       {loading ? (
         <div className="text-center my-5"><Spinner animation="border" /></div>
@@ -193,7 +278,7 @@ const Hospitals = () => {
       ) : (
         <>
           <Table responsive hover bordered className="hospital-table shadow-sm rounded">
-            <thead className="table-header bg-primary text-white">
+            <thead className="table-header text-white custom-table-header">
               <tr>
                 <th>#</th>
                 <th>Profile</th>
@@ -205,6 +290,8 @@ const Hospitals = () => {
                 </th>
                 <th>Phone</th>
                 <th>Address</th>
+                <th>License No.</th>
+                <th>License Doc</th>
                 <th>Verified</th>
                 <th>Actions</th>
               </tr>
@@ -214,22 +301,40 @@ const Hospitals = () => {
                 <tr key={hospital._id} className="hospital-row">
                   <td>{(currentPage - 1) * itemsPerPage + idx + 1}</td>
                   <td>
-                    {hospital.profileImage ? (
-                      <img
-                        src={hospital.profileImage}
-                        alt={hospital.name}
-                        className="profile-img"
-                      />
-                    ) : (
-                      <div className="profile-placeholder">
-                        {hospital.name.charAt(0).toUpperCase()}
-                      </div>
-                    )}
+                    <img
+                      src={
+                        hospital.profileImage
+                          ? `http://localhost:8000${hospital.profileImage}`
+                          : '/images/default-avatar.png'
+                      }
+                      alt={hospital.name || "Profile"}
+                      style={{
+                        width: '50px',
+                        height: '50px',
+                        objectFit: 'cover',
+                        border: '2px solid #ccc',
+                      }}
+                    />
                   </td>
-                  <td>{hospital.name}</td>
-                  <td>{hospital.email}</td>
+                  <td>{hospital.name || '-'}</td>
+                  <td>{hospital.email || '-'}</td>
                   <td>{hospital.tel || '-'}</td>
                   <td>{hospital.address || '-'}</td>
+                  <td>{hospital.licenseNumber || '-'}</td>
+                  <td>
+                    {hospital.officialDocument ? (
+                      <a
+                        href={`http://localhost:8000/uploads/${hospital.officialDocument}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-primary text-decoration-underline"
+                      >
+                        View
+                      </a>
+                    ) : (
+                      "-"
+                    )}
+                  </td>
                   <td>
                     {hospital.verified ? (
                       <span className="verified-badge">
@@ -241,27 +346,10 @@ const Hospitals = () => {
                       </span>
                     )}
                   </td>
-                  <td className="d-flex gap-1 justify-content-center">
-                    <Button
-                      size="sm"
-                      variant="outline-success"
-                      className="action-btn"
-                      onClick={() => handleEditClick(hospital)}
-                      title="Edit"
-                    >
-                      <Pencil size={16} />
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline-danger"
-                      className="action-btn"
-                      onClick={() => handleDeleteClick(hospital)}
-                      title="Delete"
-                    >
-                      <Trash2 size={16} />
-                    </Button>
+                  <td>
+                    <button onClick={() => handleEditClick(hospital)} title="Edit"><Pencil size={16} /></button>
+                    <button onClick={() => confirmDelete(hospital)} title="Delete" className="delete"><Trash size={16} /></button>
                   </td>
-
                 </tr>
               ))}
             </tbody>
@@ -287,52 +375,94 @@ const Hospitals = () => {
         </>
       )}
 
-      {/* Stats Panel */}
-      <aside className="stats-panel mt-4">
-        <h2>Hospital Blood Group Stats</h2>
-        {statsLoading ? (
-          <div className="text-center my-3"><Spinner animation="border" /></div>
-        ) : statsError ? (
-          <Alert variant="danger">{statsError}</Alert>
-        ) : stats.length === 0 ? (
-          <div>No stats available.</div>
-        ) : (
-          <ul className="stats-list list-unstyled">
-            {stats.map(({ _id: bg, count }) => (
-              <li key={bg} className="d-flex justify-content-between border-bottom py-1">
-                <strong>{bg || 'Unknown'}</strong>
-                <span>{count}</span>
-              </li>
-            ))}
-          </ul>
-        )}
-      </aside>
-
       {/* Edit Modal */}
       <Modal show={showEditModal} onHide={() => setShowEditModal(false)} centered>
-        <Form onSubmit={handleFormSubmit}>
-          <Modal.Header closeButton><Modal.Title>Edit Hospital</Modal.Title></Modal.Header>
+        <Form onSubmit={handleEditSubmit}>
+          <Modal.Header closeButton>
+            <Modal.Title>Edit Hospital</Modal.Title>
+          </Modal.Header>
           <Modal.Body>
             {formError && <Alert variant="danger">{formError}</Alert>}
             <Form.Group className="mb-3">
               <Form.Label>Name</Form.Label>
-              <Form.Control type="text" name="name" value={editHospital?.name || ''} onChange={handleFormChange} required />
+              <Form.Control
+                type="text"
+                name="name"
+                value={editForm.name}
+                onChange={handleInputChange}
+                required
+              />
             </Form.Group>
             <Form.Group className="mb-3">
               <Form.Label>Email</Form.Label>
-              <Form.Control type="email" name="email" value={editHospital?.email || ''} onChange={handleFormChange} required />
+              <Form.Control
+                type="email"
+                name="email"
+                value={editForm.email}
+                onChange={handleInputChange}
+                required
+              />
             </Form.Group>
             <Form.Group className="mb-3">
               <Form.Label>Address</Form.Label>
-              <Form.Control type="text" name="address" value={editHospital?.address || ''} onChange={handleFormChange} />
+              <Form.Control
+                type="text"
+                name="address"
+                value={editForm.address}
+                onChange={handleInputChange}
+              />
             </Form.Group>
             <Form.Group className="mb-3">
               <Form.Label>Phone</Form.Label>
-              <Form.Control type="text" name="tel" value={editHospital?.tel || ''} onChange={handleFormChange} />
+              <Form.Control
+                type="text"
+                name="tel"
+                value={editForm.tel}
+                onChange={handleInputChange}
+              />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>License Number</Form.Label>
+              <Form.Control
+                type="text"
+                name="licenseNumber"
+                value={editForm.licenseNumber}
+                onChange={handleInputChange}
+              />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>License Document</Form.Label>
+              {typeof editForm.licenseDocument === 'string' && editForm.licenseDocument && (
+                <div className="mb-2">
+                  <a
+                    href={`http://localhost:8000/uploads/${editForm.licenseDocument}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    View Existing Document
+                  </a>
+                </div>
+              )}
+              <Form.Control
+                type="file"
+                name="licenseDocument"
+                onChange={handleFileChange}
+              />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Check
+                type="checkbox"
+                label="Verified"
+                name="verified"
+                checked={editForm.verified}
+                onChange={handleInputChange}
+              />
             </Form.Group>
           </Modal.Body>
           <Modal.Footer>
-            <Button variant="secondary" onClick={() => setShowEditModal(false)}>Cancel</Button>
+            <Button variant="secondary" onClick={() => setShowEditModal(false)}>
+              Cancel
+            </Button>
             <Button type="submit" variant="primary" disabled={formLoading}>
               {formLoading ? <Spinner animation="border" size="sm" /> : 'Save Changes'}
             </Button>

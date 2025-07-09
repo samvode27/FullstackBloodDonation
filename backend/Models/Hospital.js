@@ -22,6 +22,23 @@ const hospitalSchema = mongoose.Schema({
   status: { type: Number, default: 0 },
   verified: { type: Boolean, default: false },
 
+  licenseNumber: {
+    type: String,
+    required: [true, "License number is required"],
+    unique: true,
+    match: [/^[A-Z0-9\-]{5,20}$/, 'License number format invalid'],
+  },
+
+  licenseVerified: {
+    type: Boolean,
+    default: false, // for admin review
+  },
+
+  officialDocument: {
+    type: String, // the filename
+    required: true
+  },
+
   verificationCode: { type: String, select: false },
   verificationCodeValidation: { type: Number, select: false },
   forgotPasswordCode: { type: String, select: false },

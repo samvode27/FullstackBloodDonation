@@ -7,34 +7,54 @@ dotenv.config();
 const { doHash, doHashValidation, hmacProcces } = require("../utils/hasing");
 
 const signup = async (req, res) => {
-   const { name, email, password, address, tel } = req.body;
+   const { name, email, password, address, tel, licenseNumber } = req.body;
+
    try {
-      const { error, value } = signupSchema.validate({ email, password });
+      const { error } = signupSchema.validate({ email, password });
       if (error) {
-         return res.status(401).json({
-            success: false,
-            message: error.details[0].message
-         })
+         return res.status(401).json({ success: false, message: error.details[0].message });
+      }
+
+      if (!licenseNumber) {
+         return res.status(400).json({ success: false, message: "License number is required" });
+      }
+
+      const licenseRegex = /^[A-Z0-9\-]{5,20}$/;
+      if (!licenseRegex.test(licenseNumber)) {
+         return res.status(400).json({ success: false, message: "License number format invalid" });
       }
 
       const existingHospital = await Hospital.findOne({ email });
       if (existingHospital) {
-         return res.status(401).json({
-            success: false,
-            message: 'Hospital already exists!'
-         })
+         return res.status(401).json({ success: false, message: 'Hospital already exists!' });
       }
 
-      const hashedPassword = await doHash(password, 12)
+      const existingLicense = await Hospital.findOne({ licenseNumber });
+      if (existingLicense) {
+         return res.status(400).json({ success: false, message: 'License number already in use.' });
+      }
+
+      if (!req.file) {
+         return res.status(400).json({
+            success: false,
+            message: "Official document upload is required"
+         });
+      }
+
+      const hashedPassword = await doHash(password, 12);
 
       const newHospital = new Hospital({
          name,
          email,
          password: hashedPassword,
          address,
-         tel
-      })
-      await newHospital.save()
+         tel,
+         licenseNumber,
+         officialDocument: req.file?.filename,
+         licenseVerified: false,
+      });
+
+      await newHospital.save();
 
       await transport.sendMail({
          to: newHospital.email,
@@ -43,26 +63,28 @@ const signup = async (req, res) => {
          html: `
             <div style="font-family: Arial, sans-serif; background-color: #f5f6fa; padding: 30px;">
                <div style="max-width: 600px; margin: auto; background: #ffffff; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.1);">
-               <div style="background-color: #e63946; padding: 20px; color: white; text-align: center;">
-                  <h1 style="margin: 0;">Welcome to BloodBridge!</h1>
-               </div>
-               <div style="padding: 30px; text-align: left; color: #333;">
-                  <p style="font-size: 18px;">Hi <strong>${newHospital.name}</strong>,</p>
-                  <p style="font-size: 16px; line-height: 1.6;">
-                     Thank you for registering with <strong>BloodBridge</strong> 
-                  </p>
-                  <div style="text-align: center; margin: 30px 0;">
-                     <a href="http://localhost:5173/hospitalverifycode" style="background-color: #1d3557; color: #fff; text-decoration: none; padding: 15px 25px; font-size: 16px; border-radius: 5px;">
-                     ✅ Verify Your Email
-                     </a>
+                  <div style="background-color: #e63946; padding: 20px; color: white; text-align: center;">
+                     <h1 style="margin: 0;">Welcome to BloodBridge!</h1>
                   </div>
-                  <p style="font-size: 15px; color: #555;">The link will take you to our secure verification page where you’ll enter your code. Check your inbox for it!</p>
-                  <hr style="margin: 30px 0; border: none; border-top: 1px solid #eee;">
-                  <p style="font-size: 14px; color: #999; text-align: center;">
-                     Stay safe. Stay strong.
-                     — The BloodBridge Team
-                  </p>
-               </div>
+                  <div style="padding: 30px; text-align: left; color: #333;">
+                     <p style="font-size: 18px;">Hi <strong>${newHospital.name}</strong>,</p>
+                     <p style="font-size: 16px; line-height: 1.6;">
+                        Thank you for registering with <strong>BloodBridge</strong>.
+                     </p>
+                     <div style="text-align: center; margin: 30px 0;">
+                        <a href="http://localhost:5173/hospitalverifycode" style="background-color: #1d3557; color: #fff; text-decoration: none; padding: 15px 25px; font-size: 16px; border-radius: 5px;">
+                           ✅ Verify Your Email
+                        </a>
+                     </div>
+                     <p style="font-size: 15px; color: #555;">
+                        The link will take you to our secure verification page where you’ll enter your code. Check your inbox for it!
+                     </p>
+                     <hr style="margin: 30px 0; border: none; border-top: 1px solid #eee;">
+                     <p style="font-size: 14px; color: #999; text-align: center;">
+                        Stay safe. Stay strong.
+                        — The BloodBridge Team
+                     </p>
+                  </div>
                </div>
             </div>
          `
@@ -71,39 +93,31 @@ const signup = async (req, res) => {
       res.status(201).json({
          success: true,
          message: 'Hospital registered. Now verify your email.'
-      })
+      });
 
    } catch (error) {
-      console.log(error)
+      console.log(error);
+      res.status(500).json({ success: false, message: 'Server error' });
    }
 };
 
 const signin = async (req, res) => {
    const { email, password } = req.body;
+
    try {
       const { error } = signinSchema.validate({ email, password });
-
       if (error) {
-         return res.status(401).json({
-            success: false,
-            message: error.details[0].message
-         })
+         return res.status(401).json({ success: false, message: error.details[0].message });
       }
 
       const existingHospital = await Hospital.findOne({ email }).select('+password');
       if (!existingHospital) {
-         return res.status(401).json({
-            success: false,
-            message: 'Hospital does not exists!'
-         })
+         return res.status(401).json({ success: false, message: 'Hospital does not exists!' });
       }
 
-      const result = await doHashValidation(password, existingHospital.password)
+      const result = await doHashValidation(password, existingHospital.password);
       if (!result) {
-         return res.status(401).json({
-            success: false,
-            message: 'Invalid Credentials'
-         })
+         return res.status(401).json({ success: false, message: 'Invalid Credentials' });
       }
 
       const token = jwt.sign(
@@ -116,28 +130,21 @@ const signin = async (req, res) => {
          { expiresIn: '8h' }
       );
 
-      if (!existingHospital.verified) {
-         return res.status(401).json({
-            success: false,
-            message: 'Please verify your email before logging in.'
-         });
-      }
-
-      // ✅ Clear donor token if it exists
       res.clearCookie('donorToken');
 
       res.cookie('hospitalToken', token, {
          secure: process.env.NODE_ENV === 'production',
-         expires: new Date(Date.now() + 8 * 3600000),
+         expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
          httpOnly: true,
          sameSite: 'Lax'
       });
 
-
       res.status(200).json({
          success: true,
          token,
-         message: 'Hospital logged in successfully',
+         message: existingHospital.verified
+            ? 'Hospital logged in successfully'
+            : 'Hospital logged in but not verified',
          user: {
             id: existingHospital._id,
             email: existingHospital.email,
@@ -150,9 +157,10 @@ const signin = async (req, res) => {
       });
 
    } catch (error) {
-      console.log(error)
+      console.log(error);
+      res.status(500).json({ success: false, message: "Server error" });
    }
-}
+};
 
 const sendVerificationCode = async (req, res) => {
    const { email } = req.body;
@@ -162,24 +170,17 @@ const sendVerificationCode = async (req, res) => {
    }
 
    try {
-      const existingHospital = await Hospital.findOne({ email })
+      const existingHospital = await Hospital.findOne({ email });
       if (!existingHospital) {
-         return res.status(404)
-            .json({
-               success: false,
-               message: 'Hospital does not exists!'
-            })
+         return res.status(404).json({ success: false, message: 'Hospital does not exists!' });
       }
 
       if (existingHospital.verified) {
-         return res.status(400).json({
-            success: false,
-            message: 'You are already verified!'
-         })
+         return res.status(400).json({ success: false, message: 'You are already verified!' });
       }
 
       const codeValue = Math.floor(Math.random() * 1000000).toString();
-      const hashedCodeValue = hmacProcces(codeValue, process.env.HMAC_VERIFICATION_CODE_SECRET)
+      const hashedCodeValue = hmacProcces(codeValue, process.env.HMAC_VERIFICATION_CODE_SECRET);
 
       const msg = {
          to: existingHospital.email,
@@ -191,7 +192,7 @@ const sendVerificationCode = async (req, res) => {
                <p style="font-size: 18px; color: #333;">Hello <strong>${existingHospital.name}</strong>,</p>
                <p style="font-size: 16px;">Thank you for registering with us! To complete your registration, please use the following verification code:</p>
                <div style="background: #f8f8f8; padding: 15px; border-radius: 8px; text-align: center; margin: 20px 0;">
-               <p style="font-size: 32px; font-weight: bold; color: #333;">${codeValue}</p>
+                  <p style="font-size: 32px; font-weight: bold; color: #333;">${codeValue}</p>
                </div>
                <p>This code will expire in <strong>5 minutes</strong>. Do not share it with anyone.</p>
                <p style="color: #999;">If you did not request this, you can ignore this email.</p>
@@ -199,54 +200,40 @@ const sendVerificationCode = async (req, res) => {
             </div>
          `
       };
-      await transport.sendMail(msg)
-         .then(() => console.log("Email sent successfully"))
-         .catch(err => {
-            console.error("Email sending failed:", err);
-         });
 
-
+      await transport.sendMail(msg);
       existingHospital.verificationCode = hashedCodeValue;
       existingHospital.verificationCodeValidation = Date.now();
-      await existingHospital.save()
+      await existingHospital.save();
 
-      return res.status(200).json({ success: true, message: 'Code sent!' })
+      return res.status(200).json({ success: true, message: 'Code sent!' });
 
    } catch (error) {
       console.log(error);
-      res.status(500).json({
-         success: false,
-         message: 'An error occurred while sending the verification code.'
-      });
+      res.status(500).json({ success: false, message: 'An error occurred while sending the verification code.' });
    }
-}
+};
 
 const verifyVerificationCode = async (req, res) => {
    const { email, providedCode } = req.body;
+
    try {
-      const { error, value } = acceptCodeSchema.validate({ email, providedCode });
+      const { error } = acceptCodeSchema.validate({ email, providedCode });
       if (error) {
-         return res.status(401).json({
-            success: false,
-            message: error.details[0].message
-         })
+         return res.status(401).json({ success: false, message: error.details[0].message });
       }
 
-      const existingHospital = await Hospital.findOne({ email }).select("+verificationCode +verificationCodeValidation")
+      const existingHospital = await Hospital.findOne({ email }).select("+verificationCode +verificationCodeValidation");
       if (!existingHospital) {
-         return res.status(401).json({ success: false, message: 'Hospital does not exists!' })
+         return res.status(401).json({ success: false, message: 'Hospital does not exists!' });
       }
 
       if (existingHospital.verified) {
-         return res.status(400).json({
-            success: false, message: 'You are already verified!'
-         })
+         return res.status(400).json({ success: false, message: 'You are already verified!' });
       }
 
       if (!existingHospital.verificationCode || !existingHospital.verificationCodeValidation) {
-         return res.status(400).json({
-            success: false, message: 'something is wrong with the code!'
-         })
+         return res.status(400).json({ success: false, message: 'Something is wrong with the code!' });
       }
 
       const isExpired = Date.now() - existingHospital.verificationCodeValidation > 5 * 60 * 1000;
@@ -254,16 +241,9 @@ const verifyVerificationCode = async (req, res) => {
          return res.status(400).json({ success: false, message: 'Code has expired!' });
       }
 
-      const hashedCodeValue = hmacProcces(codeValue, process.env.HMAC_VERIFICATION_CODE_SECRET)
+      const hashedCodeValue = hmacProcces(providedCode, process.env.HMAC_VERIFICATION_CODE_SECRET);
       if (hashedCodeValue !== existingHospital.verificationCode) {
          return res.status(400).json({ success: false, message: 'Invalid verification code!' });
-      }
-
-      if (Date.now() - existingHospital.verificationCodeValidation > 5 * 60 * 1000) {
-         return res.status(400).json({
-            success: false,
-            message: 'code has been expired!'
-         })
       }
 
       existingHospital.verified = true;
@@ -271,12 +251,13 @@ const verifyVerificationCode = async (req, res) => {
       existingHospital.verificationCodeValidation = undefined;
       await existingHospital.save();
 
-      return res.status(200).json({ success: true, message: 'your account has been verified!' })
+      return res.status(200).json({ success: true, message: 'Your account has been verified!' });
+
    } catch (error) {
       console.error("Verification error:", error);
       return res.status(500).json({ success: false, message: 'Internal server error' });
    }
-}
+};
 
 const changePassword = async (req, res) => {
    const { userId, verified } = req.user;
@@ -462,16 +443,47 @@ const getAllHospitals = async (req, res) => {
 //Update Hospital
 const updateHospital = async (req, res) => {
    try {
-      const updateHospital = await Hospital.findByIdAndUpdate(
-         req.params.id,
-         { $set: req.body },
+      const { id } = req.params;
+
+      const updateData = {
+         name: req.body.name,
+         email: req.body.email,
+         tel: req.body.tel,
+         address: req.body.address,
+         verified: req.body.verified,
+         licenseNumber: req.body.licenseNumber,
+      };
+
+      // Handle uploaded file
+      if (req.file) {
+         updateData.officialDocument = req.file.filename;
+      }
+
+      const hospital = await Hospital.findByIdAndUpdate(
+         id,
+         updateData,
          { new: true }
-      )
-      res.status(201).json(updateHospital)
+      );
+
+      if (!hospital) {
+         return res.status(404).json({
+            success: false,
+            message: "Hospital not found",
+         });
+      }
+
+      res.status(200).json({
+         success: true,
+         hospital,
+      });
    } catch (error) {
-      res.status(500).json(error)
+      console.error(error);
+      res.status(500).json({
+         success: false,
+         message: "Failed to update hospital",
+      });
    }
-}
+};
 
 //getOneHospital
 const getOneHospital = async (req, res) => {
@@ -538,7 +550,21 @@ const updateProfileInfo = async (req, res) => {
    try {
       const { id } = req.params;
 
-      const hospital = await Hospital.findByIdAndUpdate(id, req.body, { new: true });
+      const updateData = {
+         name: req.body.name,
+         email: req.body.email,
+         tel: req.body.tel,
+         address: req.body.address,
+         verified: req.body.verified,
+         licenseNumber: req.body.licenseNumber,
+      };
+
+      if (req.file) {
+         updateData.licenseDocument = "/uploads/" + req.file.filename;
+      }
+
+      const hospital = await Hospital.findByIdAndUpdate(id, updateData, { new: true });
+
       if (!hospital) {
          return res.status(404).json({ success: false, message: "Hospital not found" });
       }

@@ -36,15 +36,28 @@ const storage = multer.diskStorage({
   },
 });
 
-const upload = multer({ storage });
+const uploadDocument = multer({
+  storage,
+  fileFilter: (req, file, cb) => {
+    // Accept PDF or images
+    const allowed = ['.pdf', '.jpg', '.jpeg', '.png'];
+    if (!allowed.includes(path.extname(file.originalname).toLowerCase())) {
+      return cb(new Error("Only PDF, JPG, PNG allowed"));
+    }
+    cb(null, true);
+  }
+});
+
+const upload = multer({ storage});
 
 // === Auth routes ===
-router.post('/signup', signup);
+// router.post('/signup', signup);
+router.post('/signup', uploadDocument.single("document"), signup);
 router.post('/signin', signin);
 
 // === Verification routes ===
-router.patch('/sendverificationcode', identifier, sendVerificationCode);
-router.patch('/verifyverificationcode', identifier, verifyVerificationCode);
+router.patch('/sendverificationcode', sendVerificationCode);
+router.patch('/verifyverificationcode', verifyVerificationCode);
 router.patch('/changepassword', identifier, changePassword);
 router.patch('/sendforgotpasswordcode', sendForgotPasswordCode);
 router.patch('/verifyforgotpasswordcode', verifyForgotPasswordCode);
@@ -52,6 +65,8 @@ router.patch('/verifyforgotpasswordcode', verifyForgotPasswordCode);
 // === Profile routes ===
 router.get("/me", identifier1, getMyProfile);
 router.put("/updateprofile/:id", identifier1, updateProfileInfo);
+// router.put('updateprofile/:id', updateProfileInfo);
+
 router.post("/uploadprofilepic", identifier1, upload.single("image"), uploadProfilePicture);
 
 // === Hospital CRUD ===
@@ -59,7 +74,10 @@ router.post('/', createHospital);
 router.get('/', getAllHospitals);
 router.get('/stats', getHospitalStats);
 router.get('/find/:id', getOneHospital);
-router.put('/:id', updateHospital);
+// router.put('/:id', updateHospital);
+
+router.put('/:id', uploadDocument.single("officialDocument"), updateHospital);
+
 router.delete('/:id', deleteHospital);
 
 // In hospitals.js route file

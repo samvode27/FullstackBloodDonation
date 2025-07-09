@@ -9,7 +9,6 @@ import { Donorlogin } from '../redux/apiCalls';
 import { FaCheckCircle, FaTimesCircle, FaEye, FaEyeSlash } from 'react-icons/fa';
 import './DonorAuth.css';
 
-
 const DonorAuth = ({ isLogin }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -28,7 +27,8 @@ const DonorAuth = ({ isLogin }) => {
     uppercase: false,
     lowercase: false,
     number: false,
-    minLength: false
+    minLength: false,
+    specialChar: false,
   });
 
   const validatePassword = (password) => {
@@ -36,7 +36,8 @@ const DonorAuth = ({ isLogin }) => {
       uppercase: /[A-Z]/.test(password),
       lowercase: /[a-z]/.test(password),
       number: /\d/.test(password),
-      minLength: password.length >= 8
+      minLength: password.length >= 8,
+      specialChar: /[!@#$%^&*(),.?":{}|<>]/.test(password),
     });
   };
 
@@ -52,18 +53,28 @@ const DonorAuth = ({ isLogin }) => {
 
     if (isLogin) {
       try {
-        await Donorlogin(dispatch, {
+        const donorData = await Donorlogin(dispatch, {
           email: inputs.email,
-          password: inputs.password
+          password: inputs.password,
         });
+
+        if (donorData?.verified) {
+          toast.success('Login successful!');
+          navigate('/donorpage');
+        } else {
+          toast.error('The account is not verified.');
+          navigate('/donorverifycode', { state: { email: inputs.email } });
+        }
+
       } catch (err) {
-        toast.error(err.response?.data?.message || 'Login failed');
+        const errorMessage = err?.response?.data?.message || 'Login failed';
+        toast.error(errorMessage);
       } finally {
         setLoading(false);
       }
     } else {
-      const { uppercase, lowercase, number, minLength } = passwordCriteria;
-      if (!uppercase || !lowercase || !number || !minLength) {
+      const { uppercase, lowercase, number, specialChar, minLength } = passwordCriteria;
+      if (!uppercase || !lowercase || !number || !minLength || !specialChar) {
         toast.error('Password does not meet all criteria');
         setLoading(false);
         return;
@@ -169,6 +180,9 @@ const DonorAuth = ({ isLogin }) => {
                   </li>
                   <li className={passwordCriteria.minLength ? 'text-green-600' : 'text-red-500'}>
                     {passwordCriteria.minLength ? <FaCheckCircle className="inline" /> : <FaTimesCircle className="inline" />} Minimum 8 Characters
+                  </li>
+                  <li className={passwordCriteria.specialChar ? 'text-green-600' : 'text-red-500'}>
+                    {passwordCriteria.specialChar ? <FaCheckCircle className="inline" /> : <FaTimesCircle className="inline" />} One Special Character
                   </li>
                 </ul>
               </div>

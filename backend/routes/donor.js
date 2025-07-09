@@ -1,5 +1,5 @@
 const express = require("express");
-const { createDonor, getAllDonor, updateDonor, getOneDonor, deleteDonor, getDonorStats, changePassword, signin, signup, sendVerificationCode, verifyVerificationCode, sendForgotPasswordCode, verifyForgotPasswordCode, getBloodStats, getBloodGroupStats, getTopDonors, recordDonation, getMyProfile, updateProfile, getDonationHistory, donateBlood, getDonationsPerYear } = require("../cotrollers/donor");
+const { createDonor, getAllDonor, updateDonor, getOneDonor, deleteDonor, getDonorStats, changePassword, signin, signup, sendVerificationCode, verifyVerificationCode, sendForgotPasswordCode, verifyForgotPasswordCode, getBloodStats, getBloodGroupStats, getTopDonors, recordDonation, getMyProfile, updateProfile, getDonationHistory, donateBlood, getDonationsPerYear, updateDonorByAdmin } = require("../cotrollers/donor");
 const router = express.Router();
 const { identifier } = require('../middlewares/identification')
 const Donor = require("../Models/Donor");
@@ -79,5 +79,7 @@ router.get('/count', async (req, res) => {
 });
 
 router.get('/donations/yearly', getDonationsPerYear);
+
+// router.put("/admin/:id", updateDonorByAdmin);
 
 module.exports = router;
