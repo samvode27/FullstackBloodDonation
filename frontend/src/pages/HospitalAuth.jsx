@@ -1,4 +1,3 @@
-// Enhanced DonorAuth Component with Recent Styles
 import React, { useState } from 'react';
 import { publicRequest } from '../requestMethods';
 import { ToastContainer, toast } from 'react-toastify';
@@ -7,8 +6,6 @@ import { useNavigate, Link, Navigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { Hospitallogin } from '../redux/apiCalls';
 import { FaCheckCircle, FaTimesCircle, FaEye, FaEyeSlash } from 'react-icons/fa';
-// import './HospitalAuth.css';
-
 
 const HospitalAuth = ({ isLogin }) => {
   const navigate = useNavigate();
@@ -21,7 +18,9 @@ const HospitalAuth = ({ isLogin }) => {
     email: '',
     password: '',
     address: '',
-    tel: ''
+    tel: '',
+    licenseNumber: '',
+    officialDocumentFile: null
   });
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [passwordCriteria, setPasswordCriteria] = useState({
@@ -41,9 +40,23 @@ const HospitalAuth = ({ isLogin }) => {
   };
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    if (name === 'password') validatePassword(value);
-    setInputs((prev) => ({ ...prev, [name]: value }));
+    const { name, value, files } = e.target;
+
+    if (name === 'password') {
+      validatePassword(value);
+    }
+
+    if (name === 'officialDocumentFile') {
+      setInputs((prev) => ({
+        ...prev,
+        [name]: files[0]
+      }));
+    } else {
+      setInputs((prev) => ({
+        ...prev,
+        [name]: value
+      }));
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -52,12 +65,21 @@ const HospitalAuth = ({ isLogin }) => {
 
     if (isLogin) {
       try {
-        await Hospitallogin(dispatch, {
+        const hositalData = await Hospitallogin(dispatch, {
           email: inputs.email,
-          password: inputs.password
+          password: inputs.password,
         });
+
+        if (hositalData?.verified) {
+          toast.success('Login successful!');
+          navigate('/hospitalpage');
+        } else {
+          toast.error('The account is not verified.');
+          navigate('/hospitalverifycode', { state: { email: inputs.email } });
+        }
       } catch (err) {
-        toast.error(err.response?.data?.message || 'Login failed');
+        const errorMessage = err?.response?.data?.message || 'Login failed';
+        toast.error(errorMessage);
       } finally {
         setLoading(false);
       }
@@ -69,10 +91,34 @@ const HospitalAuth = ({ isLogin }) => {
         return;
       }
 
+      if (!inputs.officialDocumentFile) {
+        toast.error('Please upload your official document');
+        setLoading(false);
+        return;
+      }
+
       try {
-        await publicRequest.post('/hospitals/signup', inputs);
+        const formData = new FormData();
+        formData.append('name', inputs.name);
+        formData.append('email', inputs.email);
+        formData.append('password', inputs.password);
+        formData.append('address', inputs.address);
+        formData.append('tel', inputs.tel);
+        formData.append('licenseNumber', inputs.licenseNumber);
+        formData.append('document', inputs.officialDocumentFile);
+
+        await publicRequest.post('/hospitals/signup', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+
         toast.success('Registered successfully! Check your email.');
-        setTimeout(() => navigate('/hospitalverifycode', { state: { email: inputs.email } }), 2000);
+        setTimeout(() => {
+          navigate('/hospitalverifycode', {
+            state: { email: inputs.email }
+          });
+        }, 2000);
       } catch (err) {
         toast.error(err.response?.data?.message || 'Registration failed');
       } finally {
@@ -96,7 +142,7 @@ const HospitalAuth = ({ isLogin }) => {
           <form onSubmit={handleSubmit} className="space-y-5">
             {!isLogin && (
               <>
-                {['name', 'address', 'tel'].map((field) => (
+                {['name', 'address', 'tel', 'licenseNumber'].map((field) => (
                   <div key={field}>
                     <label htmlFor={field} className="block text-gray-700 font-medium mb-1">
                       {field.toUpperCase()}
@@ -112,6 +158,20 @@ const HospitalAuth = ({ isLogin }) => {
                     />
                   </div>
                 ))}
+
+                <div>
+                  <label htmlFor="officialDocumentFile" className="block text-gray-700 font-medium mb-1">
+                    Upload Official Document (PDF, JPG, PNG)
+                  </label>
+                  <input
+                    type="file"
+                    id="officialDocumentFile"
+                    name="officialDocumentFile"
+                    accept=".pdf,.jpg,.jpeg,.png"
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
               </>
             )}
 
@@ -175,7 +235,7 @@ const HospitalAuth = ({ isLogin }) => {
             )}
 
             {isLogin && (
-              <p className="text-sm text-gray-500">Only verified hospital can log in. Please check your email.</p>
+              <p className="text-sm text-gray-500">Only verified hospitals can log in. Please check your email.</p>
             )}
 
             <button

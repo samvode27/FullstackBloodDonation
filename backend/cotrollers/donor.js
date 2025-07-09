@@ -122,20 +122,13 @@ const signin = async (req, res) => {
          }
       );
 
-      if (!existingDonor.verified) {
-         return res.status(401).json({
-            success: false,
-            message: 'Please verify your email before logging in.'
-         });
-      }
-
       // ✅ Clear hospital token if it exists
       res.clearCookie('hospitalToken');
 
       // ✅ Set token cookie
       res.cookie('donorToken', token, {
          secure: process.env.NODE_ENV === 'production',
-         expires: new Date(Date.now() + 8 * 3600000),
+         expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
          httpOnly: true,
          sameSite: 'Lax'
       });
@@ -143,7 +136,9 @@ const signin = async (req, res) => {
       res.status(200).json({
          success: true,
          token,
-         message: 'Donor logged in successfully',
+         message: existingDonor.verified
+            ? 'Donor logged in successfully'
+            : 'Donor logged in but not verified',
          user: {
             id: existingDonor._id,
             email: existingDonor.email,
@@ -604,7 +599,7 @@ const getTopDonors = async (req, res) => {
       const donors = await Donor.find()
          .sort({ numberOfDonations: -1 })
          .limit(4)
-         .select("name bloodgroup profileImage numberOfDonations verified");
+         .select("name bloodgroup profileImage numberOfDonations verified donationHistory");
 
       const donorsWithRatingAndMedal = donors.map((donor) => {
          const rating = Math.min(5, donor.numberOfDonations * 0.5);
@@ -689,66 +684,36 @@ const donateBlood = async (req, res) => {
    }
 };
 
-const updateDonorByAdmin = async (req, res) => {
-  try {
-    const donorId = req.params.id;
-
-    const updatedData = { ...req.body };
-
-    // Optional image upload logic
-    if (req.file) {
-      const imageBuffer = req.file.buffer;
-      const result = await uploadToCloudinary(imageBuffer);
-      updatedData.profileImage = result.secure_url;
-    }
-
-    const donor = await Donor.findByIdAndUpdate(donorId, updatedData, {
-      new: true,
-    });
-
-    if (!donor) {
-      return res.status(404).json({ message: 'Donor not found' });
-    }
-
-    res.status(200).json({ message: 'Donor updated', donor });
-  } catch (err) {
-    console.error('Admin update error:', err);
-    res.status(500).json({ message: 'Internal server error' });
-  }
-};
-
 // controllers/donorController.js
 const getDonationsPerYear = async (req, res) => {
-  try {
-    const result = await Donor.aggregate([
-      { $unwind: "$donationHistory" },
-      {
-        $group: {
-          _id: { $year: "$donationHistory.date" },
-          totalDonations: { $sum: 1 }, // Or $sum: "$donationHistory.amount" if you want units
-        },
-      },
-      {
-        $project: {
-          _id: 0,
-          year: "$_id",
-          totalDonations: 1,
-        },
-      },
-      { $sort: { year: 1 } }
-    ]);
+   try {
+      const result = await Donor.aggregate([
+         { $unwind: "$donationHistory" },
+         {
+            $group: {
+               _id: { $year: "$donationHistory.date" },
+               totalDonations: { $sum: 1 }, // Or $sum: "$donationHistory.amount" if you want units
+            },
+         },
+         {
+            $project: {
+               _id: 0,
+               year: "$_id",
+               totalDonations: 1,
+            },
+         },
+         { $sort: { year: 1 } }
+      ]);
 
-    res.status(200).json(result);
-  } catch (error) {
-    console.error("Error fetching donations per year:", error);
-    res.status(500).json({ message: "Failed to fetch donations per year" });
-  }
+      res.status(200).json(result);
+   } catch (error) {
+      console.error("Error fetching donations per year:", error);
+      res.status(500).json({ message: "Failed to fetch donations per year" });
+   }
 };
-
-
 
 module.exports = {
    deleteDonor, getOneDonor, getAllDonor, getDonorStats, updateDonor, createDonor, signin, signup,
    sendVerificationCode, verifyVerificationCode, changePassword, sendForgotPasswordCode, verifyForgotPasswordCode,
-   getBloodGroupStats, getMyProfile, updateProfile, getTopDonors, getDonationHistory, donateBlood, updateDonorByAdmin, getDonationsPerYear
+   getBloodGroupStats, getMyProfile, updateProfile, getTopDonors, getDonationHistory, donateBlood, getDonationsPerYear
 }

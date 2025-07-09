@@ -1,15 +1,40 @@
-/* src/pages/DonorVerifyCode.css */
-.verify-wrapper {
-  background: linear-gradient(to bottom right, #e6f0ff, #f8f9fa);
-  padding: 1rem;
+/* Verify.css */
+
+.verify-container {
+  background: linear-gradient(135deg, #f8f9fa, #e0eafc);
 }
 
-.verify-card {
-  background: #ffffff;
-  border: 1px solid #dee2e6;
-  transition: all 0.3s ease;
+.verify-container form {
+  background-color: #ffffff;
 }
 
-.verify-card:hover {
-  box-shadow: 0 0 15px rgba(0, 123, 255, 0.2);
+.verify-container h3 {
+  color: #0d6efd;
+}
+
+.verify-container input:focus {
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+.verify-container .btn-primary {
+  background-color: #0d6efd;
+  border-color: #0d6efd;
+}
+
+.verify-container .btn-outline-primary {
+  border-color: #0d6efd;
+  color: #0d6efd;
+}
+
+.verify-container .btn-outline-primary:hover {
+  background-color: #0d6efd;
+  color: #ffffff;
+}
+
+.resendbtn:hover{
+  color: #0d6efd;
+}
+.resendbtn{
+  font-size: 16px;
 }

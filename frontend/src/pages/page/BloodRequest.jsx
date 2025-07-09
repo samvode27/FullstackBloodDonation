@@ -171,8 +171,8 @@ const BloodRequest = () => {
         </div>
       </div>
 
-      <div className="d-flex justify-content-center mb-4">
-        <PieChart width={320} height={240}>
+      <div className="d-flex justify-content-center mb-5 mt-5">
+        <PieChart width={450} height={240}>
           <Pie
             data={statusData}
             cx="50%"

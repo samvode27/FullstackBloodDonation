@@ -1304,6 +1304,7 @@ const DonorPage = () => {
                   required
                 >
                   <option value="">Select Blood Group</option>
+                  <option value="Unknown">Unknown</option> {/* ← Add this line */}
                   {Object.keys(compatibilityMap).map(bg => (
                     <option key={bg} value={bg}>
                       {bg}
@@ -1545,8 +1546,3 @@ const DonorPage = () => {
 };
 
 export default DonorPage;
-
-
-
-
-

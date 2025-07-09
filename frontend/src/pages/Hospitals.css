@@ -1,392 +1,199 @@
-/* src/pages/admin/Hospitals.css */
+/* Hospitals Page - Responsive & Modern Styles */
 
-.hospitals-page {
-  padding: 1rem 2rem;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  color: #222;
-  background: #f5f7fa;
-  min-height: 100vh;
-}
-
-.page-title {
-  font-size: 2.5rem;
-  font-weight: 700;
-  margin-bottom: 1rem;
-  color: #0b3d91;
-  text-align: center;
-}
-
-.top-bar {
-  margin-bottom: 1rem;
-  text-align: center;
-}
-
-.search-input {
-  max-width: 400px;
-  width: 90%;
-  padding: 0.5rem 1rem;
-  font-size: 1rem;
-  border-radius: 25px;
-  border: 2px solid #0b3d91;
-  outline: none;
-  transition: border-color 0.3s ease;
-}
-
-.search-input:focus {
-  border-color: #0654a6;
-  box-shadow: 0 0 8px rgba(6, 84, 166, 0.5);
-}
-
-/* Table styling */
-
-table {
-  background: white;
-  border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(15, 33, 55, 0.12);
-  overflow: hidden;
-}
-
-thead.table-light th {
-  user-select: none;
-  cursor: pointer;
-  position: relative;
-  transition: background-color 0.3s ease;
-}
-
-thead.table-light th:hover {
-  background-color: #e6f0ff;
-  color: #064273;
-}
-
-tbody tr:hover {
-  background-color: #f0f7ff;
-  cursor: default;
-}
-
-td,
-th {
-  vertical-align: middle !important;
-}
-
-.badge.bg-success {
-  background-color: #28a745 !important;
-}
-
-.badge.bg-danger {
-  background-color: #dc3545 !important;
-}
-
-/* Profile image in table */
-
-td img.rounded-circle {
-  width: 40px;
-  height: 40px;
-  object-fit: cover;
-  border-radius: 50% !important;
-  border: 1.5px solid #0b3d91;
-}
-
-td div.bg-secondary {
-  width: 40px;
-  height: 40px;
-  font-weight: 700;
-  font-size: 1.25rem;
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  user-select: none;
-  border: 1.5px solid #0b3d91;
-}
-
-/* Pagination styling */
-
-.pagination {
-  margin-top: 1rem;
-}
-
-.pagination .page-item.active .page-link {
-  background-color: #0b3d91;
-  border-color: #0b3d91;
-}
-
-.pagination .page-link {
-  color: #0b3d91;
-  cursor: pointer;
-  user-select: none;
-  transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-.pagination .page-link:hover {
-  background-color: #c3dbff;
-  color: #064273;
-}
-
-/* Stats panel */
-
-.stats-panel {
-  background: white;
-  border-radius: 10px;
-  box-shadow: 0 4px 14px rgba(15, 33, 55, 0.15);
-  padding: 1.5rem;
-  height: fit-content;
-  margin-top: 2rem;
-  max-width: 320px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.stats-panel h2 {
-  margin-top: 0;
-  color: #064273;
-  font-weight: 700;
-  margin-bottom: 1rem;
-  font-size: 1.5rem;
-  text-align: center;
-}
-
-.stats-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.stats-list li {
-  display: flex;
-  justify-content: space-between;
+/* Page Heading */
+.hospitals-page h3 {
   font-weight: 600;
-  font-size: 1.1rem;
-  padding: 0.6rem 1rem;
-  border-radius: 6px;
-  margin-bottom: 0.6rem;
-  background: #e6f0ff;
-  color: #0b3d91;
-  transition: background-color 0.3s ease;
+  color: #2c3e50;
+  border-bottom: 2px solid #007bff;
+  padding-bottom: 0.5rem;
+  margin-bottom: 2rem;
 }
 
-.stats-list li:hover {
-  background: #c3dbff;
+/* Search and Filters */
+.hospitals-page .form-control,
+.hospitals-page .form-select {
+  border-radius: 0.375rem;
+  border-color: #ced4da;
 }
 
-.bloodgroup-label {
-  letter-spacing: 1.1px;
+.hospitals-page .form-control:focus,
+.hospitals-page .form-select:focus {
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
 }
 
-.count {
-  background: #0b3d91;
-  color: white;
-  padding: 0.15rem 0.7rem;
-  border-radius: 12px;
-  font-weight: 700;
-  min-width: 40px;
-  text-align: center;
-}
-
-/* Loading, error & empty states */
-
-.loading,
-.error,
-.empty {
-  text-align: center;
-  font-size: 1.2rem;
-  color: #666;
-  margin: 2rem 0;
-}
-
-/* Modal overrides for consistent colors */
-
-.modal-content {
-  border-radius: 12px;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-.modal-header {
-  background-color: #0b3d91;
-  color: white;
-  border-bottom: none;
-  border-radius: 12px 12px 0 0;
-}
-
-.modal-title {
-  font-weight: 700;
-}
-
-.modal-footer {
-  border-top: none;
-  justify-content: flex-end;
-}
-
-/* Buttons */
-
-.btn-primary {
-  background-color: #0b3d91;
-  border-color: #0b3d91;
-  font-weight: 600;
-  transition: background-color 0.3s ease;
-}
-
-.btn-primary:hover,
-.btn-primary:focus {
-  background-color: #064273;
-  border-color: #064273;
-}
-
-/* Responsive tweaks */
-
-@media (max-width: 900px) {
-  .stats-panel {
-    max-width: 100%;
-    margin: 1.5rem 0 0 0;
-  }
-
-  .pagination {
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-}
-
-
-/* Verified/Unverified badges */
-.verified-badge {
-  display: inline-block;
-  padding: 0.3rem 0.75rem;
-  background-color: #28a745;
-  color: #fff;
-  border-radius: 20px;
-  font-weight: bold;
-  font-size: 0.9rem;
-  animation: pulse-green 1.5s infinite;
-}
-
-.unverified-badge {
-  display: inline-block;
-  padding: 0.3rem 0.75rem;
-  background-color: #dc3545;
-  color: #fff;
-  border-radius: 20px;
-  font-weight: bold;
-  font-size: 0.9rem;
-  animation: pulse-red 1.5s infinite;
-}
-
-/* Subtle pulsing animation */
-@keyframes pulse-green {
-  0% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.4); }
-  70% { box-shadow: 0 0 0 10px rgba(40, 167, 69, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0); }
-}
-
-@keyframes pulse-red {
-  0% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.4); }
-  70% { box-shadow: 0 0 0 10px rgba(220, 53, 69, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0); }
-}
-
-
+/* Table Styles */
 .hospital-table {
-  background: white;
-  border-radius: 12px;
+  background: #fff;
+  border-radius: 0.5rem;
   overflow: hidden;
   font-size: 0.95rem;
-  box-shadow: 0 8px 24px rgba(15, 33, 55, 0.1);
-  transition: all 0.3s ease;
 }
 
-.table-header th {
-  font-weight: 600;
-  font-size: 1rem;
-  letter-spacing: 0.5px;
-  background-color: #0b3d91 !important;
-  color: white !important;
+.hospital-table thead th {
+  background: linear-gradient(45deg, #007bff, #00b4d8);
+  color: #fff;
+  text-align: center;
   vertical-align: middle;
-  border-bottom: 2px solid #ccc;
 }
 
-.hospital-row {
-  transition: background-color 0.25s ease;
+.hospital-table tbody tr:hover {
+  background: #f1f3f5;
+  transition: background 0.3s;
 }
 
-.hospital-row:hover {
-  background-color: #f0f7ff;
+.hospital-table td {
+  vertical-align: middle;
+  text-align: center;
 }
 
-.profile-img {
-  width: 42px;
-  height: 42px;
+.hospital-table td img {
   border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid #0b3d91;
 }
 
-.profile-placeholder {
-  width: 42px;
-  height: 42px;
-  background-color: #6c757d;
-  color: white;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  font-size: 1.1rem;
-  border: 2px solid #0b3d91;
-  user-select: none;
+/* Sort Arrows Hover */
+.hospital-table thead th {
+  cursor: pointer;
 }
 
+.hospital-table thead th:hover {
+  background: linear-gradient(45deg, #007bff, #00b4d8);
+}
+
+/* Verified Badges */
 .verified-badge,
 .unverified-badge {
   display: inline-flex;
   align-items: center;
-  font-weight: 600;
-  padding: 0.25rem 0.6rem;
-  border-radius: 20px;
-  font-size: 0.85rem;
-  background-color: rgba(40, 167, 69, 0.1);
+  font-weight: 500;
+  font-size: 0.9rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+}
+
+.verified-badge {
+  color: #28a745;
+  background: rgba(40, 167, 69, 0.1);
 }
 
 .unverified-badge {
-  background-color: rgba(220, 53, 69, 0.1);
+  color: #dc3545;
+  background: rgba(220, 53, 69, 0.1);
 }
 
-.icon {
-  vertical-align: middle;
-  font-size: 1rem;
+.action-buttons-group {
+  display: flex;
+  justify-content: flex-end; /* push buttons to right */
+  flex-wrap: wrap;           /* wrap buttons on small screens */
+  gap: 0.5rem;               /* space between buttons */
+  margin-top: 1rem;
 }
 
-button.btn-outline-success,
-button.btn-outline-danger {
-  transition: all 0.2s ease;
+/* Your existing button styles remain, with minor improvements */
+.action-buttons-group button { 
+  background: linear-gradient(45deg, #007bff, #00b4d8);
+  border: none;
+  color: #fff;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  font-size: 0.95rem;
+  min-width: 120px;
 }
 
-button.btn-outline-success:hover {
-  background-color: #28a745;
-  color: white;
+.action-buttons-group button:hover {
+  background: linear-gradient(45deg, #0056b3, #0077b6);
 }
 
-button.btn-outline-danger:hover {
-  background-color: #dc3545;
-  color: white;
+/* Optional: make buttons full-width on very small screens */
+@media (max-width: 480px) {
+  .action-buttons-group {
+    justify-content: center;
+  }
+  .action-buttons-group button {
+    width: 100%;
+  }
 }
 
-/* Minimized action buttons in hospital table */
-.action-btn {
-  padding: 2px 6px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 6px;
-  font-size: 0.8rem;
-  height: 30px;
-  width: 30px;
+
+/* Modals */
+.modal-content {
+  border-radius: 0.5rem;
 }
 
-.action-btn svg {
-  margin: 0;
-  padding: 0;
+.modal-header {
+  background: linear-gradient(to right, #007bff, #6610f2);
+  color: #fff;
 }
 
-td.d-flex {
-  align-items: center;
+.modal-title {
+  color: #fff;
 }
 
+.modal-footer .btn-primary {
+  background: #007bff;
+  border: none;
+}
+
+.modal-footer .btn-primary:hover {
+  background: #0056b3;
+}
+
+.modal-footer .btn-danger {
+  background: #dc3545;
+  border: none;
+}
+
+.modal-footer .btn-danger:hover {
+  background: #c82333;
+}
+
+/* Pagination */
+.pagination .page-link {
+  color: #007bff;
+  border: none;
+}
+
+.pagination .page-item.active .page-link {
+  background: #007bff;
+  border-radius: 0.3rem;
+  color: #fff;
+}
+
+.pagination .page-link:hover {
+  background: #f8f9fa;
+  color: #0056b3;
+}
+
+/* Responsive table cell labels */
+@media (max-width: 768px) {
+  .hospital-table thead {
+    display: none;
+  }
+
+  .hospital-table tbody tr {
+    display: block;
+    margin-bottom: 1rem;
+    background: #fff;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+
+  .hospital-table tbody td {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #e9ecef;
+  }
+
+  .hospital-table tbody td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: #343a40;
+  }
+
+  .action-buttons {
+    justify-content: flex-end;
+  }
+}

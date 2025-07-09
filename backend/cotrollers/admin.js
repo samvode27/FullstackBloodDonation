@@ -2,6 +2,8 @@ const CryptoJs = require("crypto-js");
 const jwt = require("jsonwebtoken");
 const Admin = require("../Models/Admin");
 const dotenv = require("dotenv");
+const Donor = require("../Models/Donor");
+const Hospital = require("../Models/Hospital");
 dotenv.config();
 
 // REGISTER Admin
@@ -69,7 +71,6 @@ const loginAdmin = async (req, res) => {
   }
 };
 
-
 //Create Admin
 const createAdmin = async (req, res) => {
   try {
@@ -82,18 +83,33 @@ const createAdmin = async (req, res) => {
 }
 
 //Update admin
-const updateAdmin = async (req, res) => {
+const updateAdminProfile = async (req, res) => {
   try {
-    const updateAdmin = await Admin.findByIdAndUpdate(
-      req.params.id,
-      { $set: req.body },
+    const adminId = req.user.id;
+
+    const { name, email } = req.body;
+
+    const updated = await Admin.findByIdAndUpdate(
+      adminId,
+      { name, email },
       { new: true }
-    )
-    res.status(201).json(updateAdmin)
+    ).select("-password");
+
+    if (!updated) {
+      return res.status(404).json({ message: "Admin not found" });
+    }
+
+    res.status(200).json({
+      message: "Profile updated successfully",
+      admin: updated
+    });
+
   } catch (error) {
-    res.status(500).json(error)
+    console.error("Update admin profile error:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
-}
+};
+
 
 //delete admin
 const deleteAdmin = async (req, res) => {
@@ -105,4 +121,149 @@ const deleteAdmin = async (req, res) => {
   }
 }
 
-module.exports = { loginAdmin, registerAdmin, createAdmin, updateAdmin, deleteAdmin }
+// Fetch logged-in admin profile
+const getAdminProfile = async (req, res) => {
+  try {
+    const adminId = req.user.id;
+
+    const admin = await Admin.findById(adminId).select("-password");
+    if (!admin) {
+      return res.status(404).json({ message: "Admin not found" });
+    }
+
+    res.status(200).json(admin);
+  } catch (error) {
+    console.error("Get admin profile error:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+const updateDonorByAdmin = async (req, res) => {
+  try {
+    const donorId = req.params.id;
+
+    const updatedData = { ...req.body };
+
+    const { bloodgroup, disease, ...rootFields } = updatedData;
+
+    const donor = await Donor.findByIdAndUpdate(
+      donorId,
+      rootFields,
+      { new: true }
+    );
+
+    if (!donor) {
+      return res.status(404).json({ message: 'Donor not found' });
+    }
+
+    if (bloodgroup || disease) {
+      const update = {};
+      if (bloodgroup) {
+        update['donationHistory.0.bloodgroup'] = bloodgroup;
+      }
+      if (disease) {
+        update['donationHistory.0.disease'] = disease;
+      }
+      await Donor.updateOne(
+        { _id: donorId },
+        { $set: update }
+      );
+    }
+
+    const updatedDonor = await Donor.findById(donorId);
+
+    res.status(200).json({
+      message: 'Donor updated',
+      donor: updatedDonor
+    });
+  } catch (err) {
+    console.error('Admin update error:', err);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+const updateHospitalByAdmin = async (req, res) => {
+  try {
+    const hospitalId = req.params.id;
+
+    // Parse incoming fields safely
+    const updatedData = {
+      name: req.body.name,
+      email: req.body.email,
+      tel: req.body.tel,
+      address: req.body.address,
+      verified:
+        req.body.verified === "true" || req.body.verified === true,
+      licenseNumber: req.body.licenseNumber,
+    };
+
+    // Handle file upload
+    if (req.file) {
+      updatedData.officialDocument = req.file.filename;
+    }
+
+    const hospital = await Hospital.findByIdAndUpdate(
+      hospitalId,
+      updatedData,
+      { new: true }
+    );
+
+    if (!hospital) {
+      return res.status(404).json({ message: "Hospital not found" });
+    }
+
+    res.status(200).json({
+      message: "Hospital updated successfully",
+      hospital,
+    });
+  } catch (err) {
+    console.error("Admin update hospital error:", err);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+
+const changeAdminPassword = async (req, res) => {
+  try {
+    const adminId = req.user.id;
+
+    const { currentPassword, newPassword } = req.body;
+
+    if (!process.env.PASS) {
+      return res.status(500).json({ message: "Encryption key not configured" });
+    }
+
+    const admin = await Admin.findById(adminId);
+    if (!admin) {
+      return res.status(404).json({ message: "Admin not found" });
+    }
+
+    // Decrypt current stored password
+    const decrypted = CryptoJs.AES.decrypt(admin.password, process.env.PASS);
+    const originalPassword = decrypted.toString(CryptoJs.enc.Utf8);
+
+    if (originalPassword !== currentPassword) {
+      return res.status(401).json({ message: "Current password is incorrect" });
+    }
+
+    const encryptedPassword = CryptoJs.AES.encrypt(
+      newPassword,
+      process.env.PASS
+    ).toString();
+
+    admin.password = encryptedPassword;
+    await admin.save();
+
+    res.status(200).json({ message: "Password updated successfully" });
+
+  } catch (error) {
+    console.error("Change admin password error:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+
+module.exports = {
+  loginAdmin, registerAdmin, createAdmin, updateAdminProfile, deleteAdmin, updateHospitalByAdmin, getAdminProfile,
+  updateDonorByAdmin, updateHospitalByAdmin, changeAdminPassword
+}

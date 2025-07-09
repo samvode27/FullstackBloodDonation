@@ -5,8 +5,6 @@ const adminSchema = mongoose.Schema({
     email:{type:String, require:true},
     password:{type:String, require:true},
     status:{type:Number, default:0},
-    // role:{type:String, default:"admin"}
-    role:{type:String}
 },{
 timestamp:true
 })

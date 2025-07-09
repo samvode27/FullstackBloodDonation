@@ -21,10 +21,11 @@ export const Donorlogin = async (dispatch, user) => {
 
   try {
     const res = await publicRequest.post("/donors/signin", user);
-    console.log(res.data);
     dispatch(donorSuccess(res.data.user));
+    return res.data.user;
   } catch (error) {
     dispatch(donorFailure());
+    throw error;
   }
 };
 
@@ -33,10 +34,11 @@ export const Hospitallogin = async (dispatch, user) => {
 
   try {
     const res = await publicRequest.post("/hospitals/signin", user);
-    console.log(res.data);
     dispatch(hospitalSuccess(res.data.user));
+    return res.data.user;
   } catch (error) {
     dispatch(hospitalFailure());
+    throw error;
   }
 };
 

@@ -40,8 +40,6 @@ app.use("/api/v1/blood", bloodrequestRoute);
 
 app.use('/api/v1/ai', airoutes);
 
-app.use('/api/v1/admin', adminDonor);
-
 app.use("/api/v1/contact", contactRoute);
 
 app.use("/api/v1/newsletter", newsletterRoutes);
