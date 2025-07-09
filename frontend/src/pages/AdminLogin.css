@@ -1,0 +1,62 @@
+/* AdminLogin.css */
+
+.admin-login-container {
+  min-height: 100vh;
+  background: #f8f9fa;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+}
+
+.admin-login-card {
+  background: #ffffff;
+  padding: 3rem;
+  border-radius: 1rem;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 500px;
+}
+
+.admin-login-logo {
+  width: 150px;
+}
+
+.admin-login-title {
+  color: #dc3545;
+  font-weight: 700;
+}
+
+.admin-login-subtitle {
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+.admin-login-input {
+  border-radius: 0.5rem;
+}
+
+.admin-login-btn {
+  background-color: #dc3545;
+  color: #fff;
+  border: none;
+}
+
+.admin-login-btn:hover {
+  background-color: #bb2d3b;
+}
+
+.admin-login-forgot {
+  color: #6c757d;
+  font-size: 0.85rem;
+  text-decoration: none;
+}
+
+.admin-login-forgot:hover {
+  color: #dc3545;
+}
+
+.admin-login-footer {
+  color: #6c757d;
+  font-size: 0.8rem;
+}
