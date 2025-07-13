@@ -7,9 +7,7 @@ import { useSelector } from 'react-redux';
 import Home from './pages/Home';
 import Admin from './pages/Admin';
 import Donors from './pages/Donors';
-import Prospects from './pages/Prospects';
 import Menu from './componenets/Menu';
-import Prospect from './pages/Prospect';
 import Newdonor from './pages/Newdonor';
 import Donor from './pages/Donor';
 import AdminLogin from './pages/AdminLogin';
@@ -70,8 +68,6 @@ function App() {
         { path: '/admin/hospitals', element: <Hospitals /> },
         { path: '/admin/newhospital', element: <NewHospital /> },
         { path: '/admin/hospital/:id', element: <Hospital /> },
-        { path: '/admin/prospects', element: <Prospects /> },
-        { path: '/admin/prospect/:id', element: <Prospect /> },
         { path: '/admin/requests', element: <BloodRequest /> },
         { path: '/admin/newsletter', element: <Newsletter /> },
         { path: '/admin/campaigns', element: <Campaigns /> },

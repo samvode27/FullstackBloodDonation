@@ -6,7 +6,6 @@ const cookieParser = require('cookie-parser');
 const adminRoute = require('./routes/admin')
 const donorRoute = require('./routes/donor')
 const hospitalRoute = require('./routes/hospital')
-const prospectRoute = require('./routes/prospect')
 const bloodrequestRoute = require("./routes/bloodRequest")
 const airoutes = require("./routes/ai")
 const adminDonor = require('./routes/admin')
@@ -35,7 +34,6 @@ app.use('/uploads/profile_pics', express.static(path.join(__dirname, 'uploads/pr
 app.use('/api/v1/admin', adminRoute)
 app.use('/api/v1/donors', donorRoute)
 app.use('/api/v1/hospitals', hospitalRoute)
-app.use('/api/v1/prospects', prospectRoute)
 app.use("/api/v1/blood", bloodrequestRoute);
 
 app.use('/api/v1/ai', airoutes);
