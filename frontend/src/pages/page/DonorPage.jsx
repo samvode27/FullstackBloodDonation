@@ -668,15 +668,6 @@ const DonorPage = () => {
               >
                 <FaSignOutAlt size={18} />
               </button>
-
-              {/* Live Chat */}
-              <button
-                className="btn btn-outline-primary d-flex align-items-center gap-1 px-3 py-2 fw-semibold shadow-sm"
-                onClick={() => setShowSupportModal(true)}
-                title="Live Chat Support"
-              >
-                💬
-              </button>
             </Nav>
           </Navbar.Collapse>
         </Container>
@@ -1541,6 +1532,16 @@ const DonorPage = () => {
         </Modal>
 
       </Container >
+
+      <div className="fixed bottom-6 right-6 z-50">
+       <button
+          className="btn btn-outline-primary d-flex align-items-center gap-1 px-3 py-2 fw-semibold shadow-sm"
+          onClick={() => setShowSupportModal(true)}
+          title="Live Chat Support"
+        >
+          💬
+        </button>
+      </div>
     </div>
   );
 };

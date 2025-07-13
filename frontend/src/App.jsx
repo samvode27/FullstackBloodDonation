@@ -19,7 +19,6 @@ import Hospital from './pages/Hospital';
 import Hospitals from './pages/Hospitals';
 import NewHospital from './pages/NewHospital';
 import HospitalPage from './pages/page/HospitalPage';
-import AdminRegister from './pages/AdminRegister';
 import DonorForgot from './pages/DonorForgot';
 import HospitalForgot from './pages/HospitalForgot';
 import BloodRequest from './pages/page/BloodRequest';
@@ -43,7 +42,6 @@ function App() {
   const router = createBrowserRouter([
     { path: '/', element: <Home /> },
     { path: '/adminlogin', element: <AdminLogin /> },
-    { path: '/adminregister', element: <AdminRegister /> },
 
     { path: '/donorlogin', element: <DonorAuth isLogin={true} /> },
     { path: '/donorregister', element: <DonorAuth isLogin={false} /> },

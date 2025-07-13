@@ -27,6 +27,7 @@ const HospitalAuth = ({ isLogin }) => {
     uppercase: false,
     lowercase: false,
     number: false,
+    specialChar: false,
     minLength: false
   });
 
@@ -35,8 +36,42 @@ const HospitalAuth = ({ isLogin }) => {
       uppercase: /[A-Z]/.test(password),
       lowercase: /[a-z]/.test(password),
       number: /\d/.test(password),
+      specialChar: /[!@#$%^&*(),.?":{}|<>]/.test(password),
       minLength: password.length >= 8
     });
+  };
+
+  const validateRegistrationForm = () => {
+    const errors = [];
+
+    if (!inputs.name.trim()) errors.push('Name is required.');
+    if (!inputs.address.trim()) errors.push('Address is required.');
+
+    if (!inputs.tel.trim()) {
+      errors.push('Telephone number is required.');
+    } else if (!/^\+?\d{7,15}$/.test(inputs.tel.trim())) {
+      errors.push('Telephone number format is invalid.');
+    }
+
+    if (!inputs.licenseNumber.trim()) errors.push('License Number is required.');
+
+    if (!inputs.email.trim()) {
+      errors.push('Email is required.');
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(inputs.email.trim())) {
+      errors.push('Email format is invalid.');
+    }
+
+    if (!inputs.password.trim()) {
+      errors.push('Password is required.');
+    }
+
+    if (!inputs.officialDocumentFile) {
+      errors.push('Official document upload is required.');
+    } else if (!['application/pdf', 'image/jpeg', 'image/png'].includes(inputs.officialDocumentFile.type)) {
+      errors.push('Official document must be PDF, JPG, or PNG.');
+    }
+
+    return errors;
   };
 
   const handleChange = (e) => {
@@ -84,27 +119,27 @@ const HospitalAuth = ({ isLogin }) => {
         setLoading(false);
       }
     } else {
-      const { uppercase, lowercase, number, minLength } = passwordCriteria;
-      if (!uppercase || !lowercase || !number || !minLength) {
-        toast.error('Password does not meet all criteria');
-        setLoading(false);
-        return;
+      const formErrors = validateRegistrationForm();
+
+      const { uppercase, lowercase, number, specialChar, minLength } = passwordCriteria;
+      if (!uppercase || !lowercase || !number || !specialChar || !minLength) {
+        formErrors.push('Password does not meet all criteria.');
       }
 
-      if (!inputs.officialDocumentFile) {
-        toast.error('Please upload your official document');
+      if (formErrors.length > 0) {
+        formErrors.forEach((err) => toast.error(err));
         setLoading(false);
         return;
       }
 
       try {
         const formData = new FormData();
-        formData.append('name', inputs.name);
-        formData.append('email', inputs.email);
-        formData.append('password', inputs.password);
-        formData.append('address', inputs.address);
-        formData.append('tel', inputs.tel);
-        formData.append('licenseNumber', inputs.licenseNumber);
+        formData.append('name', inputs.name.trim());
+        formData.append('email', inputs.email.trim());
+        formData.append('password', inputs.password.trim());
+        formData.append('address', inputs.address.trim());
+        formData.append('tel', inputs.tel.trim());
+        formData.append('licenseNumber', inputs.licenseNumber.trim());
         formData.append('document', inputs.officialDocumentFile);
 
         await publicRequest.post('/hospitals/signup', formData, {
@@ -153,6 +188,13 @@ const HospitalAuth = ({ isLogin }) => {
                       name={field}
                       value={inputs[field]}
                       onChange={handleChange}
+                      placeholder={
+                        field === 'name' ? 'Enter hospital name' :
+                        field === 'address' ? 'Enter address' :
+                        field === 'tel' ? 'e.g. +251912345678' :
+                        field === 'licenseNumber' ? 'Hospital license number' :
+                        ''
+                      }
                       className="w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-red-400"
                       required
                     />
@@ -185,6 +227,7 @@ const HospitalAuth = ({ isLogin }) => {
                 name="email"
                 value={inputs.email}
                 onChange={handleChange}
+                placeholder="example@hospital.com"
                 className="w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-red-400"
                 required
                 autoFocus
@@ -202,6 +245,7 @@ const HospitalAuth = ({ isLogin }) => {
                   name="password"
                   value={inputs.password}
                   onChange={handleChange}
+                  placeholder="Enter password"
                   className="w-full px-4 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-red-400"
                   required
                 />
@@ -226,6 +270,9 @@ const HospitalAuth = ({ isLogin }) => {
                   </li>
                   <li className={passwordCriteria.number ? 'text-green-600' : 'text-red-500'}>
                     {passwordCriteria.number ? <FaCheckCircle className="inline" /> : <FaTimesCircle className="inline" />} One Number
+                  </li>
+                  <li className={passwordCriteria.specialChar ? 'text-green-600' : 'text-red-500'}>
+                    {passwordCriteria.specialChar ? <FaCheckCircle className="inline" /> : <FaTimesCircle className="inline" />} One Special Character (e.g. ! @ # $ %)
                   </li>
                   <li className={passwordCriteria.minLength ? 'text-green-600' : 'text-red-500'}>
                     {passwordCriteria.minLength ? <FaCheckCircle className="inline" /> : <FaTimesCircle className="inline" />} Minimum 8 Characters
