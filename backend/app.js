@@ -8,7 +8,6 @@ const donorRoute = require('./routes/donor')
 const hospitalRoute = require('./routes/hospital')
 const bloodrequestRoute = require("./routes/bloodRequest")
 const airoutes = require("./routes/ai")
-const adminDonor = require('./routes/admin')
 const contactRoute = require("./routes/contact");
 const newsletterRoutes = require("./routes/newsletter");
 const campaignRoute = require("./routes/campaign"); 
