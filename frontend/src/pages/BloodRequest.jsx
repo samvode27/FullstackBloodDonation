@@ -8,7 +8,7 @@ import {
   Form,
 } from 'react-bootstrap';
 import { PieChart, Pie, Cell, Tooltip as RechartsTooltip, Legend } from 'recharts';
-import { publicRequest } from '../../requestMethods';
+import { publicRequest } from '../requestMethods';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';

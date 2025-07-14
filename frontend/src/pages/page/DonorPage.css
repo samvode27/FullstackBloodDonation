@@ -6,7 +6,7 @@
 .badge-rank {
   top: -10px;
   right: -10px;
-  background-color: #dc3545; /* Bootstrap danger */
+  background-color: #dc3545; 
   color: white;
   padding: 0.25rem 0.5rem;
   font-size: 0.85rem;

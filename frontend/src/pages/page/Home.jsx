@@ -1,15 +1,13 @@
 // src/pages/Home.jsx
 import React, { useEffect, useRef, useState } from 'react';
-import BloodCompatibility from './BloodCompatibility';
+import BloodCompatibility from '../BloodCompatibility';
 import { useNavigate } from 'react-router-dom';
-import { FaExclamationTriangle, FaTint, FaArrowRight } from 'react-icons/fa';
-import { Tooltip } from 'react-tooltip';
+import { FaExclamationTriangle, FaTint, FaArrowRight } from 'react-icons/fa';;
 import './Home.css';
-import Sidebar from '../componenets/Sidebar';
-import { adminRequest, publicRequest } from "../requestMethods";
+import { adminRequest, publicRequest } from "../../requestMethods";
 import AOS from 'aos';
 import 'aos/dist/aos.css';
-import bloodImage from '../assets/a.jpg';
+import bloodImage from '../../assets/a.jpg';
 import { ChevronRightIcon } from '@heroicons/react/24/solid';
 
 const Home = () => {

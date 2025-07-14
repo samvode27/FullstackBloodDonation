@@ -6,8 +6,6 @@ const Donor = require("../Models/Donor");
 const Hospital = require("../Models/Hospital");
 dotenv.config();
 
-// REGISTER Admin
-// ✅ GOOD: consistent encryption like registerAdmin
 const registerAdmin = async (req, res) => {
   try {
     if (!process.env.PASS) {

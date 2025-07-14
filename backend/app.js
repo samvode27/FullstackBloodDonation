@@ -8,7 +8,6 @@ const donorRoute = require('./routes/donor')
 const hospitalRoute = require('./routes/hospital')
 const bloodrequestRoute = require("./routes/bloodRequest")
 const airoutes = require("./routes/ai")
-const adminDonor = require('./routes/admin')
 const contactRoute = require("./routes/contact");
 const newsletterRoutes = require("./routes/newsletter");
 const campaignRoute = require("./routes/campaign"); 
@@ -47,7 +46,7 @@ app.use('/api/v1/admin/newsletter', require('./routes/newsletter'));
 app.use("/api/v1/admin/campaign", campaignRoute);
 
 
-// ✅ Schedule reminder job
+
 require('./jobs/sendReminders');
 
 
