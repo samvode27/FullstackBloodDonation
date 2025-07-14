@@ -46,7 +46,7 @@ app.use('/api/v1/admin/newsletter', require('./routes/newsletter'));
 app.use("/api/v1/admin/campaign", campaignRoute);
 
 
-// ✅ Schedule reminder job
+
 require('./jobs/sendReminders');
 
 
